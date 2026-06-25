@@ -56,15 +56,30 @@
 <body> 
     <!-- BLOCK 2: NAVIGATION SIDEBAR & LAYOUT HEADER -->
     <sidebar> 
-        <h2>HCPS Interpreter Portal</h2> 
-        <p style="font-size: 0.85rem; color: #94a3b8; margin-top: -10px; padding-bottom: 10px;">Harrisonburg City Public Schools</p> 
-        <nav> 
-            <a onclick="switchSection('schedule-sec', this)" class="active">📋 Daily Schedule</a> 
-            <a onclick="switchSection('conference-sec', this)">📅 Conference Days</a> 
-            <a onclick="switchSection('task-sec', this)">✅ Task Board</a> 
-            <a onclick="switchSection('directory-sec', this)">👥 Program Directory</a> 
-        </nav> 
-    </sidebar> 
+    <!-- Official School Picture Graphic Asset -->
+    <div style="text-align: center; margin-bottom: 15px;">
+        <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" 
+             alt="HCPS Campus Logo" 
+             style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #f39200; background: white; object-fit: contain;">
+    </div>
+
+    <!-- Official District Header Logo GIF Asset -->
+    <div style="background: white; padding: 8px; border-radius: 6px; margin-bottom: 15px; text-align: center;">
+        <img src="https://www.harrisonburg.k12.va.us/custom/images/design/header/1/logo.gif" 
+             alt="HCPS Logo" 
+             style="max-width: 100%; height: auto;">
+    </div>
+
+    <h2>HCPS Interpreter Portal</h2> 
+    <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: -10px; padding-bottom: 10px;">Harrisonburg City Public Schools</p> 
+    <nav> 
+        <a onclick="switchSection('schedule-sec', this)" class="active">📋 Daily Schedule</a> 
+        <a onclick="switchSection('conference-sec', this)">📅 Conference Days</a> 
+        <a onclick="switchSection('task-sec', this)">✅ Task Board</a> 
+        <a onclick="switchSection('directory-sec', this)">👥 Program Directory</a> 
+    </nav> 
+</sidebar>
+
     <main> 
         <div class="header"> 
             <div> 
