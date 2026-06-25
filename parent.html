@@ -63,19 +63,22 @@
                 status: "Pending"
             };
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+        try {
+            // Sends data smoothly without triggering Google's security blocks
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                body: JSON.stringify(payload)
+            });
 
-                if(response.ok) {
-                    alert("Your interpreter request has been sent to HCPS. Thank you!");
-                    document.getElementById('mobileRequestForm').reset();
-                } else {
-                    alert("Error submitting form. Please try again.");
-                }
+            // Since 'no-cors' mode hides the response status, we show success here
+            alert("Your interpreter request has been sent to HCPS. Thank you!");
+            document.getElementById('mobileRequestForm').reset();
+
+        } catch (err) {
+            console.error(err);
+            alert("Connection error. Please try again.");
+        }
             } catch (err) {
                 console.error(err);
                 // For layout testing if no API endpoint is connected yet
