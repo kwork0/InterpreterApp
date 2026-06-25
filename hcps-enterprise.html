@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCPS Interpreter Portal — Harrisonburg City Public Schools</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --blue:      #003087;
+  --blue-mid:  #0044BB;
+  --blue-lt:   #1A5CC8;
+  --gold:      #C8962A;
+  --gold-lt:   #E3B44A;
+  --white:     #FFFFFF;
+  --off:       #F4F6FA;
+  --rule:      #DDE2EE;
+  --text:      #0D1A36;
+  --mid:       #3A4A6B;
+  --muted:     #6B7A9A;
+  --bg:        #EFF2F8;
+  --sidebar:   #00204F;
+  --sb-border: #0A2E6E;
+  --green:     #1A7A4A;
+  --amber:     #A06010;
+  --red:       #A01820;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+.screen { display: none; }
+.screen.active { display: flex; }
+
+/* ══ LOGIN ══ */
+#login-screen {
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue);
+  position: relative;
+  overflow: hidden;
+}
+#login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-55deg, transparent 0, transparent 60px, rgba(255,255,255,0.022) 60px, rgba(255,255,255,0.022) 61px);
+  pointer-events: none;
+}
+#login-screen::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--gold);
+}
+
+.login-wrap {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; max-width: 420px; padding: 24px;
+}
+.login-header { text-align: center; margin-bottom: 32px; color: var(--white); }
+.login-seal {
+  width: 62px; height: 62px;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  font-family: 'Libre Baskerville', serif;
+  font-weight: 700; font-size: 18px; letter-spacing: 1px;
+  color: var(--gold);
+}
+.login-school { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 5px; }
+.login-district { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 700; color: var(--white); }
+.login-sub-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+.login-card {
+  background: var(--white);
+  border-radius: 3px;
+  border-top: 4px solid var(--gold);
+  padding: 34px 34px 30px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.lc-title { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+.lc-sub { font-size: 12px; color: var(--muted); margin-bottom: 26px; }
+
+.role-row { display: flex; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; margin-bottom: 22px; }
+.role-btn {
+  flex: 1; padding: 9px 6px;
+  border: none; border-right: 1px solid var(--rule);
+  background: var(--off); color: var(--muted);
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.3px; cursor: pointer; transition: all 0.15s;
+}
+.role-btn:last-child { border-right: none; }
+.role-btn.active { background: var(--blue); color: var(--white); }
+
+.form-field { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--mid); margin-bottom: 5px; }
+.form-input {
+  width: 100%; border: 1px solid var(--rule); border-radius: 3px;
+  padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 14px;
+  color: var(--text); outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--blue); }
+
+.btn-primary {
+  width: 100%; padding: 12px; background: var(--blue); border: none;
+  border-radius: 3px; color: var(--white); font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-top: 4px;
+}
+.btn-primary:hover { background: var(--blue-mid); }
+
+.login-foot { text-align: center; margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.45); }
+.login-foot a { color: var(--gold-lt); text-decoration: none; }
+
+/* ══ DASHBOARD SHELL ══ */
+#dashboard-screen { min-height: 100vh; flex-direction: row; }
+
+.sidebar {
+  width: 230px; flex-shrink: 0;
+  background: var(--sidebar);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sb-head { padding: 22px 20px 18px; border-bottom: 1px solid var(--sb-border); }
+.sb-district { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 3px; }
+.sb-school { font-family: 'Libre Baskerville', serif; font-size: 13px; color: var(--white); font-weight: 700; margin-bottom: 1px; }
+.sb-portal { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+.nav-sec { padding: 14px 0 4px; }
+.nav-sec-label { padding: 0 20px 6px; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+.nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.58); cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s; user-select: none;
+}
+.nav-link:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.nav-link.active { color: var(--white); background: rgba(255,255,255,0.07); border-left-color: var(--gold); }
+.nav-icon { width: 16px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; background: var(--gold); color: var(--sidebar);
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.sb-divider { margin: 8px 20px; border: none; border-top: 1px solid var(--sb-border); }
+
+.sb-user {
+  margin-top: auto; padding: 16px 20px;
+  border-top: 1px solid var(--sb-border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sb-av {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--gold); color: var(--sidebar);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  font-family: 'Libre Baskerville', serif;
+}
+.sb-name { font-size: 12px; font-weight: 600; color: var(--white); }
+.sb-role { font-size: 11px; color: rgba(255,255,255,0.38); }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; background: var(--bg); min-width: 0; }
+
+.topbar {
+  background: var(--white); border-bottom: 1px solid var(--rule);
+  padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 20;
+}
+.tb-title { font-family: 'Libre Baskerville', serif; font-size: 16px; font-weight: 700; color: var(--blue); }
+.tb-right { display: flex; align-items: center; gap: 10px; }
+.tb-btn {
+  background: none; border: 1px solid var(--rule); border-radius: 3px;
+  padding: 6px 14px; font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600; color: var(--mid); cursor: pointer;
+  transition: all 0.15s;
+}
+.tb-btn:hover { border-color: var(--blue); color: var(--blue); }
+.tb-btn-p { background: var(--blue); border-color: var(--blue); color: var(--white); }
+.tb-btn-p:hover { background: var(--blue-mid); color: var(--white); }
+.notif-pip { display: inline-block; width: 6px; height: 6px; background: var(--red); border-radius: 50%; margin-left: 4px; vertical-align: middle; }
+
+/* PANELS */
+.panel { display: none; padding: 28px 32px 48px; }
+.panel.active { display: block; }
+
+/* ── SHARED ── */
+.pg-head { margin-bottom: 24px; }
+.pg-title { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.pg-sub { font-size: 13px; color: var(--muted); }
+
+.card { background: var(--white); border: 1px solid var(--rule); border-radius: 3px; padding: 22px; }
+.card-title { font-family: 'Libre Baskerville', serif; font-size: 14px; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+.card-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+.rule { border: none; border-top: 1px solid var(--rule); margin: 20px 0; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 18px; }
+
+.stat-tile {
+  background: var(--white); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 20px; border-top: 3px solid var(--blue);
+}
+.stat-tile.gold  { border-top-color: var(--gold); }
+.stat-tile.green { border-top-color: var(--green); }
+.stat-tile.muted { border-top-color: var(--muted); }
+.st-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.st-val { font-family: 'JetBrains Mono', monospace; font-size: 30px; letter-spacing: -1px; color: var(--text); margin-bottom: 5px; }
+.st-delta { font-size: 11px; color: var(--muted); }
+.st-delta.up   { color: var(--green); }
+.st-delta.warn { color: var(--amber); }
+
+.tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; padding: 2px 8px; border-radius: 2px; text-transform: uppercase; }
+.tag-blue  { background: #E6EDFA; color: var(--blue); }
+.tag-gold  { background: #FAF0E0; color: var(--amber); }
+.tag-green { background: #E6F4EC; color: var(--green); }
+.tag-red   { background: #FAE6E8; color: var(--red); }
+.tag-gray  { background: #EAEEF5; color: var(--muted); }
+
+.bar-track { background: var(--off); border-radius: 2px; height: 7px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 2px; background: var(--blue); }
+.bar-fill.gold  { background: var(--gold); }
+.bar-fill.green { background: var(--green); }
+
+/* ══════════════════════════════════════
+   INTERPRETER DASHBOARD
+══════════════════════════════════════ */
+
+/* Today's schedule */
+.schedule-table { width: 100%; border-collapse: collapse; }
+.schedule-table th {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 8px 12px; text-align: left;
+  background: var(--off); border-bottom: 1px solid var(--rule);
+}
+.schedule-table td {
+  padding: 12px 12px; font-size: 13px;
+  border-bottom: 1px solid var(--off);
+  vertical-align: middle;
+}
+.schedule-table tr:last-child td { border-bottom: none; }
+.schedule-table tr:hover td { background: #F8FAFD; }
+
+.period-badge {
+  background: var(--blue); color: var(--white);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  padding: 3px 8px; border-radius: 2px;
+  display: inline-block;
+}
+.time-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.lang-pill {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px; letter-spacing: 0.3px;
+}
+.lang-es { background: #E6EDFA; color: var(--blue); }
+.lang-so { background: #FAF0E0; color: var(--amber); }
+.lang-ar { background: #E6F4EC; color: var(--green); }
+.lang-ht { background: #F0EAF8; color: #6B3AAA; }
+.lang-am { background: #FAE6E8; color: var(--red); }
+
+.status-row { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.s-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.s-green { background: var(--green); }
+.s-gold  { background: var(--gold); }
+.s-gray  { background: var(--muted); }
+.s-blue  { background: var(--blue); }
+
+.now-bar {
+  background: rgba(0,48,135,0.06);
+  border-left: 3px solid var(--blue);
+}
+.now-bar td { color: var(--text); font-weight: 500; }
+
+/* Hours tracker */
+.hours-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
+.day-col { text-align: center; }
+.day-name { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.day-bar-wrap { height: 80px; background: var(--off); border-radius: 3px; position: relative; overflow: hidden; }
+.day-bar-fill {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--blue); border-radius: 3px 3px 0 0;
+  transition: height 0.4s ease;
+}
+.day-bar-fill.today { background: var(--gold); }
+.day-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mid); margin-top: 5px; }
+
+/* ══════════════════════════════════════
+   CONFERENCE DAY ASSIGNMENTS
+══════════════════════════════════════ */
+.conf-banner {
+  background: var(--blue);
+  border-radius: 3px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.conf-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(-55deg, transparent 0, transparent 40px, rgba(255,255,255,0.025) 40px, rgba(255,255,255,0.025) 41px);
+}
+.conf-banner::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--gold); }
+.cb-left { position: relative; }
+.cb-event { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.cb-title { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.cb-meta { font-size: 12px; color: rgba(255,255,255,0.6); }
+.cb-right { position: relative; text-align: right; }
+.cb-date-num { font-family: 'JetBrains Mono', monospace; font-size: 38px; color: var(--gold); line-height: 1; }
+.cb-date-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+.location-table { width: 100%; border-collapse: collapse; }
+.location-table th {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--muted); padding: 9px 14px; text-align: left;
+  background: var(--off); border-bottom: 1px solid var(--rule);
+}
+.location-table td {
+  padding: 13px 14px; font-size: 13px;
+  border-bottom: 1px solid var(--off); vertical-align: middle;
+}
+.location-table tr:last-child td { border-bottom: none; }
+.location-table tr:hover td { background: #F8FAFD; }
+.location-table tr.my-row td { background: #EEF4FF; font-weight: 600; }
+
+.interp-av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--white);
+  font-family: 'Libre Baskerville', serif; flex-shrink: 0;
+}
+.interp-cell { display: flex; align-items: center; gap: 8px; }
+.room-badge {
+  background: var(--off); border: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; padding: 3px 10px; border-radius: 2px;
+  color: var(--mid);
+}
+.room-badge.assigned { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+/* ══════════════════════════════════════
+   TASKS
+══════════════════════════════════════ */
+.task-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.filter-row { display: flex; gap: 6px; }
+.f-btn {
+  background: var(--white); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.f-btn:hover, .f-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+.kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.kol { background: var(--off); border: 1px solid var(--rule); border-radius: 3px; padding: 14px; }
+.kol-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.kol-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--mid); display: flex; align-items: center; gap: 7px; }
+.kol-pipe { width: 3px; height: 14px; border-radius: 2px; }
+.kol-count { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.task-card {
+  background: var(--white); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 14px; margin-bottom: 10px; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.task-card:hover { border-color: var(--blue); box-shadow: 0 2px 10px rgba(0,48,135,0.07); }
+.task-card.done { opacity: 0.58; }
+.tk-title { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+.tk-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 11px; }
+.tk-foot { display: flex; align-items: center; justify-content: space-between; }
+.tk-due { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* ══════════════════════════════════════
+   ORG CHART
+══════════════════════════════════════ */
+#orgCanvas { display: block; max-width: 100%; }
+
+/* ══════════════════════════════════════
+   PEOPLE
+══════════════════════════════════════ */
+.search-inp {
+  width: 100%; border: 1px solid var(--rule); border-radius: 3px;
+  padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 13px;
+  color: var(--text); outline: none; margin-bottom: 16px; transition: border-color 0.15s;
+  background: var(--white);
+}
+.search-inp:focus { border-color: var(--blue); }
+
+.people-tbl { background: var(--white); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+.tbl-h {
+  display: grid; grid-template-columns: 2.2fr 1.2fr 1.4fr 0.8fr 0.9fr;
+  padding: 9px 20px; background: var(--off); border-bottom: 1px solid var(--rule);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted);
+}
+.tbl-r {
+  display: grid; grid-template-columns: 2.2fr 1.2fr 1.4fr 0.8fr 0.9fr;
+  padding: 13px 20px; align-items: center;
+  border-bottom: 1px solid var(--off); transition: background 0.1s; cursor: default;
+}
+.tbl-r:last-child { border-bottom: none; }
+.tbl-r:hover { background: var(--off); }
+.p-cell { display: flex; align-items: center; gap: 10px; }
+.p-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--white);
+  font-family: 'Libre Baskerville', serif; flex-shrink: 0;
+}
+.p-name { font-size: 13px; font-weight: 600; }
+.p-email { font-size: 11px; color: var(--muted); }
+.c-text { font-size: 12px; color: var(--mid); }
+.c-sub  { font-size: 11px; color: var(--muted); }
+.msg-btn {
+  font-size: 11px; font-weight: 600; padding: 5px 12px;
+  border: 1px solid var(--rule); background: none; border-radius: 3px;
+  color: var(--blue); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.msg-btn:hover { background: var(--blue); color: var(--white); border-color: var(--blue); }
+
+/* ══════════════════════════════════════
+   EVENTS
+══════════════════════════════════════ */
+.events-layout { display: grid; grid-template-columns: 285px 1fr; gap: 20px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-month-lbl { font-family: 'Libre Baskerville', serif; font-size: 14px; font-weight: 700; }
+.cal-nav { background: none; border: 1px solid var(--rule); border-radius: 3px; color: var(--muted); padding: 4px 10px; cursor: pointer; font-size: 13px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-dl { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-align: center; color: var(--muted); padding: 4px 0; }
+.cal-d { font-size: 12px; text-align: center; padding: 7px 3px; border-radius: 2px; cursor: pointer; position: relative; color: var(--mid); transition: background 0.1s; }
+.cal-d:hover { background: var(--off); }
+.cal-d.today { background: var(--blue); color: var(--white); font-weight: 700; }
+.cal-d.has-ev::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+.cal-d.dim { color: rgba(0,0,0,0.2); }
+.cal-legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 12px; }
+.cal-leg-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+
+.ev-list { display: flex; flex-direction: column; gap: 12px; }
+.ev-row {
+  background: var(--white); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 16px 18px; display: flex; gap: 16px; align-items: flex-start;
+  border-left: 4px solid var(--blue); transition: border-left-color 0.15s;
+}
+.ev-row:hover { border-left-color: var(--gold); }
+.ev-row.dead  { border-left-color: var(--red); }
+.ev-row.conf  { border-left-color: var(--gold); }
+.ev-row.award { border-left-color: var(--green); }
+.ev-date { text-align: center; flex-shrink: 0; min-width: 40px; }
+.ev-day  { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; color: var(--blue); line-height: 1; }
+.ev-mon  { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.ev-body { flex: 1; }
+.ev-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.ev-meta  { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+
+/* ══════════════════════════════════════
+   CONTRIBUTIONS
+══════════════════════════════════════ */
+.contrib-banner {
+  background: var(--blue); border-radius: 3px; padding: 24px 30px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 20px; position: relative; overflow: hidden;
+}
+.contrib-banner::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-55deg, transparent 0, transparent 40px, rgba(255,255,255,0.025) 40px, rgba(255,255,255,0.025) 41px); }
+.contrib-banner::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--gold); }
+.cb-score { font-family: 'JetBrains Mono', monospace; font-size: 52px; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 6px; }
+.cb-lbl { font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; margin-bottom: 12px; }
+.cb-rank-num { font-family: 'JetBrains Mono', monospace; font-size: 38px; color: var(--gold); }
+.cb-rank-lbl { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+.hm-grid { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 4px; margin-top: 6px; }
+.hm-week { display: flex; flex-direction: column; gap: 3px; }
+.hm-cell { width: 13px; height: 13px; border-radius: 2px; background: var(--off); flex-shrink: 0; }
+.hm-cell.l1 { background: #C5D4F0; }
+.hm-cell.l2 { background: #7A9ED8; }
+.hm-cell.l3 { background: #2F6BBF; }
+.hm-cell.l4 { background: var(--blue); }
+.hm-legend { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); margin-top: 10px; }
+.hm-lc { width: 11px; height: 11px; border-radius: 1px; }
+
+.ct-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 18px; }
+.ct-card { background: var(--white); border: 1px solid var(--rule); border-radius: 3px; padding: 18px; border-top: 3px solid var(--blue); }
+.ct-card.gold  { border-top-color: var(--gold); }
+.ct-card.green { border-top-color: var(--green); }
+.ct-card.muted { border-top-color: var(--muted); }
+.ct-val  { font-family: 'JetBrains Mono', monospace; font-size: 28px; color: var(--text); margin-bottom: 4px; letter-spacing: -1px; }
+.ct-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+
+.al-list { display: flex; flex-direction: column; gap: 0; }
+.al-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--off); }
+.al-item:last-child { border-bottom: none; }
+.al-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--blue); background: var(--white); flex-shrink: 0; margin-top: 2px; }
+.al-dot.green { border-color: var(--green); }
+.al-dot.gold  { border-color: var(--gold); }
+.al-body { flex: 1; }
+.al-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.al-meta  { font-size: 11px; color: var(--muted); }
+.al-time  { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen" class="screen active">
+  <div class="login-wrap">
+    <div class="login-header">
+      <div class="login-seal">HHS</div>
+      <div class="login-school">Harrisonburg City Public Schools</div>
+      <div class="login-district">Interpreter Services Portal</div>
+      <div class="login-sub-label">Student Language Interpreter Program</div>
+    </div>
+    <div class="login-card">
+      <div class="lc-title">Sign In</div>
+      <div class="lc-sub">Use your HCPS school credentials to access the portal.</div>
+      <div class="role-row">
+        <button class="role-btn active" onclick="selectRole(this,'Student Interpreter')">Interpreter</button>
+        <button class="role-btn" onclick="selectRole(this,'Program Coordinator')">Coordinator</button>
+        <button class="role-btn" onclick="selectRole(this,'Administrator')">Administrator</button>
+      </div>
+      <div class="form-field">
+        <label class="form-label">School Email</label>
+        <input class="form-input" type="email" id="l-email" placeholder="firstname.lastname@hcps.k12.va.us" value="alex.johnson@hcps.k12.va.us">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="l-pass" placeholder="Enter your password" value="password">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    </div>
+    <div class="login-foot">Need help? <a href="#">Contact the Help Desk</a> &nbsp;|&nbsp; <a href="#">Reset Password</a></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard-screen" class="screen">
+
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="sb-district">Harrisonburg City Public Schools</div>
+      <div class="sb-school">Interpreter Services</div>
+      <div class="sb-portal">Student Language Program</div>
+    </div>
+
+    <div class="nav-sec">
+      <div class="nav-sec-label">Interpreter</div>
+      <div class="nav-link active" onclick="showPanel('interp',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M2 2h5v2H4v8h8v-3h2v5H2V2zm8 0h4v4h-2V4.8l-5.6 5.6-1.4-1.4L12.2 3.4 11 3.2V2z"/></svg>
+        Daily Schedule
+      </div>
+      <div class="nav-link" onclick="showPanel('conference',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><rect x="1" y="3" width="14" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+        Conference Day
+        <span class="nav-badge">1</span>
+      </div>
+    </div>
+
+    <hr class="sb-divider">
+
+    <div class="nav-sec">
+      <div class="nav-sec-label">Work</div>
+      <div class="nav-link" onclick="showPanel('tasks',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M2 3h12v2H2V3zm0 4h12v2H2V7zm0 4h8v2H2v-2z"/></svg>
+        Tasks
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('org',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><circle cx="8" cy="3" r="2"/><circle cx="3" cy="12" r="2"/><circle cx="13" cy="12" r="2"/><path d="M8 5v4M8 9l-5 2M8 9l5 2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+        Organization
+      </div>
+    </div>
+
+    <hr class="sb-divider">
+
+    <div class="nav-sec">
+      <div class="nav-sec-label">People</div>
+      <div class="nav-link" onclick="showPanel('people',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><circle cx="6" cy="5" r="3"/><path d="M0 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="13" cy="5" r="2"/><path d="M13 9c1.7 0 3 1.3 3 3"/></svg>
+        Supervised By
+      </div>
+    </div>
+
+    <hr class="sb-divider">
+
+    <div class="nav-sec">
+      <div class="nav-sec-label">Activity</div>
+      <div class="nav-link" onclick="showPanel('events',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><rect x="1" y="3" width="14" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+        Upcoming Events
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('contributions',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M2 12h2V8H2v4zm4 2h2V6H6v8zm4-6h2v6h-2V8zm4-4h2v10h-2V4z"/></svg>
+        Contributions
+      </div>
+    </div>
+
+    <div class="sb-user">
+      <div class="sb-av" id="sb-av">AJ</div>
+      <div>
+        <div class="sb-name" id="sb-name">Alex Johnson</div>
+        <div class="sb-role" id="sb-role">Student Interpreter</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">Daily Schedule</div>
+      <div class="tb-right">
+        <button class="tb-btn">Notifications <span class="notif-pip"></span></button>
+        <button class="tb-btn">Settings</button>
+        <button class="tb-btn tb-btn-p" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- ─── INTERPRETER DASHBOARD ─── -->
+    <div id="panel-interp" class="panel active">
+      <div class="pg-head">
+        <div class="pg-title">Interpreter Dashboard</div>
+        <div class="pg-sub">Your spoken language interpretation assignments for today — <span id="today-date"></span></div>
+      </div>
+
+      <div class="g4" style="margin-bottom:20px">
+        <div class="stat-tile">
+          <div class="st-label">Assignments Today</div>
+          <div class="st-val">5</div>
+          <div class="st-delta">Periods 1, 2, 4, 5, 7</div>
+        </div>
+        <div class="stat-tile gold">
+          <div class="st-label">Hours This Week</div>
+          <div class="st-val">8.5</div>
+          <div class="st-delta up">On track for 12 hrs</div>
+        </div>
+        <div class="stat-tile green">
+          <div class="st-label">Total Hours (Semester)</div>
+          <div class="st-val">86</div>
+          <div class="st-delta up">12 hrs ahead of goal</div>
+        </div>
+        <div class="stat-tile muted">
+          <div class="st-label">Languages Active</div>
+          <div class="st-val">3</div>
+          <div class="st-delta">Spanish, Somali, Arabic</div>
+        </div>
+      </div>
+
+      <!-- Today's Schedule -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-title">Today's Assignment Schedule</div>
+        <div class="card-sub">Thursday, June 25, 2026 &nbsp;&middot;&nbsp; Harrisonburg High School</div>
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Time</th>
+              <th>Room / Location</th>
+              <th>Teacher</th>
+              <th>Student(s)</th>
+              <th>Language</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="period-badge">P1</span></td>
+              <td class="time-cell">8:05 – 8:55</td>
+              <td>Room 114 &mdash; English</td>
+              <td>Ms. Delgado</td>
+              <td>M. Gutierrez</td>
+              <td><span class="lang-pill lang-es">Spanish</span></td>
+              <td><div class="status-row"><div class="s-dot s-green"></div>Complete</div></td>
+            </tr>
+            <tr>
+              <td><span class="period-badge">P2</span></td>
+              <td class="time-cell">9:00 – 9:50</td>
+              <td>Room 208 &mdash; Math</td>
+              <td>Mr. Okonkwo</td>
+              <td>F. Ahmed</td>
+              <td><span class="lang-pill lang-so">Somali</span></td>
+              <td><div class="status-row"><div class="s-dot s-green"></div>Complete</div></td>
+            </tr>
+            <tr class="now-bar">
+              <td><span class="period-badge">P4</span></td>
+              <td class="time-cell">11:05 – 11:55</td>
+              <td>Room 301 &mdash; Science</td>
+              <td>Dr. Mills</td>
+              <td>L. Ramirez</td>
+              <td><span class="lang-pill lang-es">Spanish</span></td>
+              <td><div class="status-row"><div class="s-dot s-blue"></div>In Progress</div></td>
+            </tr>
+            <tr>
+              <td><span class="period-badge">P5</span></td>
+              <td class="time-cell">12:00 – 12:50</td>
+              <td>Room 115 &mdash; Social Studies</td>
+              <td>Ms. Rivera</td>
+              <td>Y. Hassan</td>
+              <td><span class="lang-pill lang-ar">Arabic</span></td>
+              <td><div class="status-row"><div class="s-dot s-gray"></div>Upcoming</div></td>
+            </tr>
+            <tr>
+              <td><span class="period-badge">P7</span></td>
+              <td class="time-cell">2:05 – 2:55</td>
+              <td>Room 204 &mdash; English</td>
+              <td>Mr. Chen</td>
+              <td>C. Morales</td>
+              <td><span class="lang-pill lang-es">Spanish</span></td>
+              <td><div class="status-row"><div class="s-dot s-gray"></div>Upcoming</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Hours This Week -->
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">Hours Logged This Week</div>
+          <div class="card-sub">Mon Jun 23 &ndash; Fri Jun 27 &nbsp;&middot;&nbsp; Goal: 12 hrs</div>
+          <div class="hours-grid">
+            <div class="day-col">
+              <div class="day-name">Mon</div>
+              <div class="day-bar-wrap"><div class="day-bar-fill" style="height:83%"></div></div>
+              <div class="day-val">2.5h</div>
+            </div>
+            <div class="day-col">
+              <div class="day-name">Tue</div>
+              <div class="day-bar-wrap"><div class="day-bar-fill" style="height:100%"></div></div>
+              <div class="day-val">3.0h</div>
+            </div>
+            <div class="day-col">
+              <div class="day-name">Wed</div>
+              <div class="day-bar-wrap"><div class="day-bar-fill" style="height:50%"></div></div>
+              <div class="day-val">1.5h</div>
+            </div>
+            <div class="day-col">
+              <div class="day-name">Thu</div>
+              <div class="day-bar-wrap"><div class="day-bar-fill today" style="height:53%"></div></div>
+              <div class="day-val">1.5h</div>
+            </div>
+            <div class="day-col">
+              <div class="day-name">Fri</div>
+              <div class="day-bar-wrap"><div class="day-bar-fill" style="height:0%"></div></div>
+              <div class="day-val">&mdash;</div>
+            </div>
+          </div>
+          <div class="rule"></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--muted)">Week total so far</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-weight:600">8.5 / 12.0 hrs</span>
+          </div>
+          <div class="bar-track" style="margin-top:8px;height:9px"><div class="bar-fill" style="width:71%"></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Language Breakdown</div>
+          <div class="card-sub">Assignments by language, current semester</div>
+          <div style="display:flex;flex-direction:column;gap:13px;margin-top:4px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                <span><span class="lang-pill lang-es" style="margin-right:6px">Spanish</span></span>
+                <span style="font-family:'JetBrains Mono',monospace">64 sessions</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:74%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                <span><span class="lang-pill lang-so" style="margin-right:6px">Somali</span></span>
+                <span style="font-family:'JetBrains Mono',monospace">18 sessions</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill gold" style="width:21%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                <span><span class="lang-pill lang-ar" style="margin-right:6px">Arabic</span></span>
+                <span style="font-family:'JetBrains Mono',monospace">4 sessions</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill green" style="width:5%"></div></div>
+            </div>
+          </div>
+          <div class="rule"></div>
+          <div class="card-title" style="margin-bottom:3px">Semester Hours Goal</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+            <span style="color:var(--muted)">86 of 74 hours completed</span>
+            <span class="tag tag-green">Goal Met</span>
+          </div>
+          <div class="bar-track" style="height:9px"><div class="bar-fill green" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CONFERENCE DAY ─── -->
+    <div id="panel-conference" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Conference Day Assignments</div>
+        <div class="pg-sub">Room and schedule assignments for interpreter-supported parent-teacher conference days</div>
+      </div>
+
+      <div class="conf-banner">
+        <div class="cb-left">
+          <div class="cb-event">Next Conference Day</div>
+          <div class="cb-title">Parent-Teacher Conference &mdash; Fall 2026</div>
+          <div class="cb-meta">Harrisonburg High School &nbsp;&middot;&nbsp; All interpreter slots confirmed</div>
+        </div>
+        <div class="cb-right">
+          <div class="cb-date-num">Sep 18</div>
+          <div class="cb-date-label">Thursday &mdash; 3:30 PM to 7:00 PM</div>
+        </div>
+      </div>
+
+      <!-- Upcoming conference days selector -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-title">Conference Day Schedule</div>
+        <div class="card-sub">Select a conference day to view interpreter location assignments</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+          <button class="f-btn active">Sep 18, 2026 &mdash; Fall PT Conference</button>
+          <button class="f-btn">Nov 6, 2026 &mdash; Mid-Year PT Conference</button>
+          <button class="f-btn">Mar 5, 2027 &mdash; Spring PT Conference</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-title">Interpreter Location Assignments</div>
+        <div class="card-sub">Thursday, September 18, 2026 &nbsp;&middot;&nbsp; 3:30 PM &ndash; 7:00 PM &nbsp;&middot;&nbsp; Your assignment is highlighted</div>
+        <table class="location-table">
+          <thead>
+            <tr>
+              <th>Interpreter</th>
+              <th>Language</th>
+              <th>Assigned Room</th>
+              <th>Session Block</th>
+              <th>Supervising Teacher</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="my-row">
+              <td>
+                <div class="interp-cell">
+                  <div class="interp-av" style="background:var(--blue)">AJ</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700">Alex Johnson</div>
+                    <div style="font-size:11px;color:var(--muted)">You</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="lang-pill lang-es">Spanish</span></td>
+              <td><span class="room-badge assigned">Room 114</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px">3:30 – 5:30 PM</td>
+              <td class="c-text">Ms. Delgado</td>
+              <td><span class="tag tag-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="interp-cell">
+                  <div class="interp-av" style="background:#1A5CC8">MR</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Maria Reyes</div>
+                    <div style="font-size:11px;color:var(--muted)">Grade 10</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="lang-pill lang-es">Spanish</span></td>
+              <td><span class="room-badge">Room 208</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px">3:30 – 7:00 PM</td>
+              <td class="c-text">Mr. Okonkwo</td>
+              <td><span class="tag tag-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="interp-cell">
+                  <div class="interp-av" style="background:#C8962A">KA</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Khadija Ahmed</div>
+                    <div style="font-size:11px;color:var(--muted)">Grade 11</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="lang-pill lang-so">Somali</span></td>
+              <td><span class="room-badge">Room 301</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px">4:00 – 7:00 PM</td>
+              <td class="c-text">Dr. Mills</td>
+              <td><span class="tag tag-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="interp-cell">
+                  <div class="interp-av" style="background:#1A7A4A">YH</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Yusuf Hassan</div>
+                    <div style="font-size:11px;color:var(--muted)">Grade 12</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="lang-pill lang-ar">Arabic</span></td>
+              <td><span class="room-badge">Main Office</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px">3:30 – 5:30 PM</td>
+              <td class="c-text">Mr. Chen</td>
+              <td><span class="tag tag-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="interp-cell">
+                  <div class="interp-av" style="background:#6B3AAA">JD</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Jean Desir</div>
+                    <div style="font-size:11px;color:var(--muted)">Grade 10</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="lang-pill lang-ht">Haitian Creole</span></td>
+              <td><span class="room-badge">Room 115</span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px">5:00 – 7:00 PM</td>
+              <td class="c-text">Ms. Rivera</td>
+              <td><span class="tag tag-gold">Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">Interpreter Preparation Checklist</div>
+          <div class="card-sub">Items to complete before September 18</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+              <div style="width:16px;height:16px;border-radius:2px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+              Review assigned family files
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+              <div style="width:16px;height:16px;border-radius:2px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+              Confirm room assignment with coordinator
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+              <div style="width:16px;height:16px;border-radius:2px;background:var(--rule);flex-shrink:0"></div>
+              Attend pre-conference interpreter briefing
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+              <div style="width:16px;height:16px;border-radius:2px;background:var(--rule);flex-shrink:0"></div>
+              Submit hours log by end of conference day
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Conference Day Summary</div>
+          <div class="card-sub">Sep 18, 2026 &mdash; All interpreters</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Total interpreters assigned</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:600">5</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Languages covered</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:600">4</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Confirmed</span>
+              <span class="tag tag-green">4 of 5</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Pending confirmation</span>
+              <span class="tag tag-gold">1</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--muted)">Total coverage hours</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:600">17.5 hrs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TASKS ─── -->
+    <div id="panel-tasks" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Task Board</div>
+        <div class="pg-sub">Manage interpreter-related assignments, training tasks, and action items</div>
+      </div>
+      <div class="task-controls">
+        <div class="filter-row">
+          <button class="f-btn active">All</button>
+          <button class="f-btn">Mine</button>
+          <button class="f-btn">Overdue</button>
+        </div>
+        <button class="btn-primary" style="width:auto;padding:8px 20px;font-size:13px">New Task</button>
+      </div>
+      <div class="kanban">
+        <div class="kol">
+          <div class="kol-head">
+            <div class="kol-title"><div class="kol-pipe" style="background:var(--muted)"></div>To Do</div>
+            <span class="kol-count">2</span>
+          </div>
+          <div class="task-card">
+            <div class="tk-title">Complete Ethics Training Module</div>
+            <div class="tk-desc">Finish the HCPS interpreter ethics and confidentiality online training. Required before next conference day.</div>
+            <div class="tk-foot"><span class="tk-due">Due Jul 5</span><span class="tag tag-blue">Training</span></div>
+          </div>
+          <div class="task-card">
+            <div class="tk-title">Submit End-of-Month Hours Log</div>
+            <div class="tk-desc">Compile and submit June hours report to program coordinator by end of month.</div>
+            <div class="tk-foot"><span class="tk-due">Due Jun 30</span><span class="tag tag-gold">Admin</span></div>
+          </div>
+        </div>
+        <div class="kol">
+          <div class="kol-head">
+            <div class="kol-title"><div class="kol-pipe" style="background:var(--blue)"></div>In Progress</div>
+            <span class="kol-count">2</span>
+          </div>
+          <div class="task-card">
+            <div class="tk-title">Glossary Review &mdash; Academic Spanish</div>
+            <div class="tk-desc">Review and expand the academic vocabulary glossary for Science and Social Studies courses in preparation for Fall assignments.</div>
+            <div class="tk-foot"><span class="tk-due">Due Jun 28</span><span class="tag tag-blue">Preparation</span></div>
+          </div>
+          <div class="task-card">
+            <div class="tk-title">Conference Briefing Attendance</div>
+            <div class="tk-desc">Attend the coordinator-led pre-conference briefing and note all room assignments and protocol updates.</div>
+            <div class="tk-foot"><span class="tk-due">Sep 14</span><span class="tag tag-red">Required</span></div>
+          </div>
+        </div>
+        <div class="kol">
+          <div class="kol-head">
+            <div class="kol-title"><div class="kol-pipe" style="background:var(--green)"></div>Completed</div>
+            <span class="kol-count">3</span>
+          </div>
+          <div class="task-card done">
+            <div class="tk-title">Interpreter Orientation &mdash; Spring 2026</div>
+            <div class="tk-desc">Attended program orientation and signed code of conduct and confidentiality agreement.</div>
+            <div class="tk-foot"><span class="tk-due">Jan 8</span><span class="tag tag-green">Done</span></div>
+          </div>
+          <div class="task-card done">
+            <div class="tk-title">Mid-Semester Hours Review</div>
+            <div class="tk-desc">Reviewed hours logged with coordinator and confirmed accuracy of session records through March.</div>
+            <div class="tk-foot"><span class="tk-due">Apr 1</span><span class="tag tag-green">Done</span></div>
+          </div>
+          <div class="task-card done">
+            <div class="tk-title">Spring Conference Day Assignment</div>
+            <div class="tk-desc">Completed all assigned sessions at the March 5 parent-teacher conference. Logged 3.5 hrs.</div>
+            <div class="tk-foot"><span class="tk-due">Mar 5</span><span class="tag tag-green">Done</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── ORG ─── -->
+    <div id="panel-org" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Organization Chart</div>
+        <div class="pg-sub">Program structure &mdash; HCPS Student Interpreter Program</div>
+      </div>
+      <div class="card" style="padding:28px 20px 36px;overflow-x:auto;margin-bottom:18px">
+        <canvas id="orgCanvas" width="860" height="440"></canvas>
+      </div>
+      <div class="g4">
+        <div class="stat-tile"><div class="st-label">Student Interpreters</div><div class="st-val">12</div><div class="st-delta">Active this semester</div></div>
+        <div class="stat-tile gold"><div class="st-label">Languages</div><div class="st-val">5</div><div class="st-delta">Spanish, Somali, Arabic, Haitian Creole, Amharic</div></div>
+        <div class="stat-tile green"><div class="st-label">Total Hours (Semester)</div><div class="st-val">430</div><div class="st-delta up">Program-wide</div></div>
+        <div class="stat-tile muted"><div class="st-label">Conference Days</div><div class="st-val">3</div><div class="st-delta">This academic year</div></div>
+      </div>
+    </div>
+
+    <!-- ─── PEOPLE ─── -->
+    <div id="panel-people" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Supervised By</div>
+        <div class="pg-sub">Faculty and staff responsible for your participation in the interpreter program</div>
+      </div>
+      <input class="search-inp" type="search" placeholder="Search by name, role, or department...">
+      <div class="people-tbl">
+        <div class="tbl-h"><div>Name</div><div>Role</div><div>Department</div><div>Status</div><div>Contact</div></div>
+        <div class="tbl-r">
+          <div class="p-cell"><div class="p-av" style="background:#003087">RM</div><div><div class="p-name">Dr. Rebecca Mills</div><div class="p-email">r.mills@hcps.k12.va.us</div></div></div>
+          <div><div class="c-text">Program Director</div><div class="c-sub">Primary supervisor</div></div>
+          <div class="c-text">Interpreter Services</div>
+          <div><div class="status-row"><div class="s-dot s-green"></div>Active</div></div>
+          <div><button class="msg-btn">Message</button></div>
+        </div>
+        <div class="tbl-r">
+          <div class="p-cell"><div class="p-av" style="background:#1A5CC8">TK</div><div><div class="p-name">Mr. Thomas Kaur</div><div class="p-email">t.kaur@hcps.k12.va.us</div></div></div>
+          <div><div class="c-text">Program Coordinator</div><div class="c-sub">Day-to-day contact</div></div>
+          <div class="c-text">Interpreter Services</div>
+          <div><div class="status-row"><div class="s-dot s-green"></div>Active</div></div>
+          <div><button class="msg-btn">Message</button></div>
+        </div>
+        <div class="tbl-r">
+          <div class="p-cell"><div class="p-av" style="background:#C8962A">SP</div><div><div class="p-name">Ms. Sonia Patel</div><div class="p-email">s.patel@hcps.k12.va.us</div></div></div>
+          <div><div class="c-text">ELL Liaison</div><div class="c-sub">Secondary contact</div></div>
+          <div class="c-text">English Language Learning</div>
+          <div><div class="status-row"><div class="s-dot s-gold"></div>Away</div></div>
+          <div><button class="msg-btn">Message</button></div>
+        </div>
+        <div class="tbl-r">
+          <div class="p-cell"><div class="p-av" style="background:#1A7A4A">JC</div><div><div class="p-name">Mr. James Chen</div><div class="p-email">j.chen@hcps.k12.va.us</div></div></div>
+          <div><div class="c-text">Principal</div><div class="c-sub">Executive oversight</div></div>
+          <div class="c-text">Administration</div>
+          <div><div class="status-row"><div class="s-dot s-green"></div>Active</div></div>
+          <div><button class="msg-btn">Message</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── EVENTS ─── -->
+    <div id="panel-events" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Upcoming Events</div>
+        <div class="pg-sub">Interpreter program events, training sessions, and conference days</div>
+      </div>
+      <div class="events-layout">
+        <div class="card">
+          <div class="cal-head">
+            <div class="cal-month-lbl">June 2026</div>
+            <div style="display:flex;gap:4px"><button class="cal-nav">&#8249;</button><button class="cal-nav">&#8250;</button></div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-dl">Su</div><div class="cal-dl">Mo</div><div class="cal-dl">Tu</div><div class="cal-dl">We</div><div class="cal-dl">Th</div><div class="cal-dl">Fr</div><div class="cal-dl">Sa</div>
+            <div class="cal-d dim">31</div><div class="cal-d dim">1</div><div class="cal-d dim">2</div><div class="cal-d dim">3</div><div class="cal-d dim">4</div><div class="cal-d dim">5</div><div class="cal-d dim">6</div>
+            <div class="cal-d">1</div><div class="cal-d">2</div><div class="cal-d has-ev">3</div><div class="cal-d">4</div><div class="cal-d">5</div><div class="cal-d">6</div><div class="cal-d">7</div>
+            <div class="cal-d">8</div><div class="cal-d">9</div><div class="cal-d">10</div><div class="cal-d">11</div><div class="cal-d">12</div><div class="cal-d has-ev">13</div><div class="cal-d">14</div>
+            <div class="cal-d">15</div><div class="cal-d">16</div><div class="cal-d">17</div><div class="cal-d">18</div><div class="cal-d">19</div><div class="cal-d">20</div><div class="cal-d">21</div>
+            <div class="cal-d">22</div><div class="cal-d">23</div><div class="cal-d today">25</div><div class="cal-d has-ev">26</div><div class="cal-d">27</div><div class="cal-d">28</div><div class="cal-d">29</div>
+            <div class="cal-d">30</div><div class="cal-d dim">1</div><div class="cal-d dim">2</div><div class="cal-d dim">3</div><div class="cal-d dim">4</div><div class="cal-d dim">5</div><div class="cal-d dim">6</div>
+          </div>
+          <div class="cal-legend"><div class="cal-leg-dot"></div> Scheduled event</div>
+        </div>
+        <div class="ev-list">
+          <div class="ev-row">
+            <div class="ev-date"><div class="ev-day">26</div><div class="ev-mon">Jun</div></div>
+            <div class="ev-body">
+              <div class="ev-title">Hours Log Submission Deadline</div>
+              <div class="ev-meta">Submit June hours via HCPS Portal &nbsp;&middot;&nbsp; 11:59 PM</div>
+              <div style="display:flex;gap:8px"><span class="tag tag-red">Deadline</span><span style="font-size:11px;color:var(--red)">Action required &mdash; 1 day away</span></div>
+            </div>
+          </div>
+          <div class="ev-row conf">
+            <div class="ev-date"><div class="ev-day" style="color:var(--gold)">18</div><div class="ev-mon">Sep</div></div>
+            <div class="ev-body">
+              <div class="ev-title">Parent-Teacher Conference Day &mdash; Fall 2026</div>
+              <div class="ev-meta">Harrisonburg High School &nbsp;&middot;&nbsp; 3:30 PM &ndash; 7:00 PM &nbsp;&middot;&nbsp; Room 114 assigned</div>
+              <div style="display:flex;gap:8px"><span class="tag tag-green">Confirmed</span><span class="tag tag-gold">Conference Day</span></div>
+            </div>
+          </div>
+          <div class="ev-row">
+            <div class="ev-date"><div class="ev-day">14</div><div class="ev-mon">Sep</div></div>
+            <div class="ev-body">
+              <div class="ev-title">Pre-Conference Interpreter Briefing</div>
+              <div class="ev-meta">Room 301 &nbsp;&middot;&nbsp; 3:00 PM &ndash; 4:00 PM &nbsp;&middot;&nbsp; Attendance required</div>
+              <div style="display:flex;gap:8px"><span class="tag tag-blue">Required</span></div>
+            </div>
+          </div>
+          <div class="ev-row">
+            <div class="ev-date"><div class="ev-day">5</div><div class="ev-mon">Jul</div></div>
+            <div class="ev-body">
+              <div class="ev-title">Ethics &amp; Confidentiality Training Deadline</div>
+              <div class="ev-meta">Online via HCPS Learning Portal &nbsp;&middot;&nbsp; Self-paced &nbsp;&middot;&nbsp; Due by midnight</div>
+              <div style="display:flex;gap:8px"><span class="tag tag-gold">Training</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CONTRIBUTIONS ─── -->
+    <div id="panel-contributions" class="panel">
+      <div class="pg-head">
+        <div class="pg-title">Contributions</div>
+        <div class="pg-sub">Your recorded service hours and program participation, Spring Semester 2026</div>
+      </div>
+
+      <div class="contrib-banner">
+        <div style="position:relative">
+          <div class="cb-score">86</div>
+          <div class="cb-lbl">Total Service Hours &mdash; Spring Semester 2026</div>
+          <div style="display:flex;gap:8px"><span class="tag tag-green">Goal exceeded by 12 hrs</span><span class="tag tag-blue">Top interpreter this semester</span></div>
+        </div>
+        <div style="text-align:right;position:relative">
+          <div class="cb-rank-num">#1</div>
+          <div class="cb-rank-lbl">Program rank</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.38);margin-top:2px">Of 12 interpreters</div>
+        </div>
+      </div>
+
+      <div class="ct-grid">
+        <div class="ct-card"><div class="ct-val">86</div><div class="ct-name">Total Hours</div></div>
+        <div class="ct-card gold"><div class="ct-val">86</div><div class="ct-name">Sessions Completed</div></div>
+        <div class="ct-card green"><div class="ct-val">3</div><div class="ct-name">Conference Days</div></div>
+        <div class="ct-card muted"><div class="ct-val">3</div><div class="ct-name">Languages Served</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-title">Activity Record</div>
+        <div class="card-sub">Daily service activity, January &mdash; June 2026</div>
+        <div class="hm-grid" id="heatmap"></div>
+        <div class="hm-legend">
+          No activity
+          <div class="hm-lc" style="background:var(--off)"></div>
+          <div class="hm-lc hm-cell l1"></div>
+          <div class="hm-lc hm-cell l2"></div>
+          <div class="hm-lc hm-cell l3"></div>
+          <div class="hm-lc hm-cell l4"></div>
+          High activity
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">Hours by Month</div>
+          <div class="card-sub">Semester breakdown</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">January</span><span style="font-family:'JetBrains Mono',monospace">12 hrs</span></div><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">February</span><span style="font-family:'JetBrains Mono',monospace">14 hrs</span></div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">March</span><span style="font-family:'JetBrains Mono',monospace">18 hrs</span></div><div class="bar-track"><div class="bar-fill gold" style="width:96%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">April</span><span style="font-family:'JetBrains Mono',monospace">14 hrs</span></div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">May</span><span style="font-family:'JetBrains Mono',monospace">16 hrs</span></div><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">June (to date)</span><span style="font-family:'JetBrains Mono',monospace">12 hrs</span></div><div class="bar-track"><div class="bar-fill green" style="width:64%"></div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Sessions</div>
+          <div class="card-sub">Last five recorded entries</div>
+          <div class="al-list">
+            <div class="al-item"><div class="al-dot"></div><div class="al-body"><div class="al-title">P4 &mdash; Science, Room 301</div><div class="al-meta">Spanish &nbsp;&middot;&nbsp; 0.75 hrs &nbsp;&middot;&nbsp; Dr. Mills</div></div><div class="al-time">Today</div></div>
+            <div class="al-item"><div class="al-dot green"></div><div class="al-body"><div class="al-title">P2 &mdash; Math, Room 208</div><div class="al-meta">Somali &nbsp;&middot;&nbsp; 0.75 hrs &nbsp;&middot;&nbsp; Mr. Okonkwo</div></div><div class="al-time">Today</div></div>
+            <div class="al-item"><div class="al-dot"></div><div class="al-body"><div class="al-title">P1 &mdash; English, Room 114</div><div class="al-meta">Spanish &nbsp;&middot;&nbsp; 0.75 hrs &nbsp;&middot;&nbsp; Ms. Delgado</div></div><div class="al-time">Jun 24</div></div>
+            <div class="al-item"><div class="al-dot gold"></div><div class="al-body"><div class="al-title">P5 &mdash; Social Studies, Room 115</div><div class="al-meta">Arabic &nbsp;&middot;&nbsp; 0.75 hrs &nbsp;&middot;&nbsp; Ms. Rivera</div></div><div class="al-time">Jun 23</div></div>
+            <div class="al-item"><div class="al-dot"></div><div class="al-body"><div class="al-title">P7 &mdash; English, Room 204</div><div class="al-meta">Spanish &nbsp;&middot;&nbsp; 0.75 hrs &nbsp;&middot;&nbsp; Mr. Chen</div></div><div class="al-time">Jun 22</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentRole = 'Student Interpreter';
+
+function selectRole(btn, role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRole = role;
+}
+
+function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  if (!email) { alert('Please enter your school email address.'); return; }
+  const namePart = email.split('@')[0].replace('.', ' ');
+  const name = namePart.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const initials = namePart.split(' ').map(w => (w[0] || '').toUpperCase()).join('').slice(0,2);
+  document.getElementById('sb-name').textContent = name;
+  document.getElementById('sb-role').textContent = currentRole;
+  document.getElementById('sb-av').textContent = initials || 'U';
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('dashboard-screen').classList.add('active');
+  buildHeatmap();
+  drawOrgChart();
+  const now = new Date();
+  const d = document.getElementById('today-date');
+  if (d) d.textContent = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+function doLogout() {
+  document.getElementById('dashboard-screen').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+}
+
+const panelTitles = {
+  interp: 'Daily Schedule',
+  conference: 'Conference Day Assignments',
+  tasks: 'Task Board',
+  org: 'Organization Chart',
+  people: 'Supervised By',
+  events: 'Upcoming Events',
+  contributions: 'Contributions'
+};
+
+function showPanel(id, navEl) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('tb-title').textContent = panelTitles[id] || id;
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  if (id === 'org') drawOrgChart();
+}
+
+function buildHeatmap() {
+  const c = document.getElementById('heatmap');
+  if (!c) return;
+  c.innerHTML = '';
+  for (let w = 0; w < 26; w++) {
+    const col = document.createElement('div');
+    col.className = 'hm-week';
+    for (let d = 0; d < 7; d++) {
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell';
+      const r = Math.random();
+      // School days more active Mon–Fri
+      const isWeekend = d === 0 || d === 6;
+      const active = isWeekend ? r > 0.9 : r > 0.25;
+      if (active) {
+        const intensity = Math.random();
+        if (intensity > 0.7) cell.classList.add('l4');
+        else if (intensity > 0.45) cell.classList.add('l3');
+        else if (intensity > 0.2) cell.classList.add('l2');
+        else cell.classList.add('l1');
+      }
+      col.appendChild(cell);
+    }
+    c.appendChild(col);
+  }
+}
+
+function drawOrgChart() {
+  const canvas = document.getElementById('orgCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = 860, H = 440;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  const BLUE  = '#003087';
+  const GOLD  = '#C8962A';
+  const RULE  = '#DDE2EE';
+  const TEXT  = '#0D1A36';
+  const MUTED = '#6B7A9A';
+  const OFF   = '#F4F6FA';
+  const WHITE = '#FFFFFF';
+
+  const NW = 155, NH = 56, R = 3;
+
+  function rr(x, y, w, h, r2) {
+    ctx.beginPath();
+    ctx.moveTo(x+r2,y); ctx.lineTo(x+w-r2,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r2);
+    ctx.lineTo(x+w,y+h-r2); ctx.quadraticCurveTo(x+w,y+h,x+w-r2,y+h);
+    ctx.lineTo(x+r2,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r2);
+    ctx.lineTo(x,y+r2); ctx.quadraticCurveTo(x,y,x+r2,y);
+    ctx.closePath();
+  }
+
+  function line(x1,y1,x2,y2) {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle = RULE; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  function node(x, y, name, title, type) {
+    ctx.shadowColor = 'rgba(0,0,0,0.07)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
+    rr(x,y,NW,NH,R);
+    ctx.fillStyle = type === 'root' ? BLUE : WHITE; ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+    ctx.lineWidth = 1; ctx.strokeStyle = type === 'root' ? BLUE : RULE;
+    rr(x,y,NW,NH,R); ctx.stroke();
+    if (type !== 'root') {
+      ctx.fillStyle = type === 'head' ? BLUE : GOLD;
+      ctx.fillRect(x, y, NW, 3);
+    }
+    const ax = x + 22, ay = y + NH/2;
+    ctx.beginPath(); ctx.arc(ax, ay, 13, 0, Math.PI*2);
+    ctx.fillStyle = type === 'root' ? 'rgba(255,255,255,0.18)' : (type === 'head' ? '#E6EDFA' : '#FAF0E0');
+    ctx.fill();
+    ctx.strokeStyle = type === 'root' ? 'rgba(255,255,255,0.35)' : RULE;
+    ctx.lineWidth = 1; ctx.stroke();
+    const init = name.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2);
+    ctx.font = '700 9px "Libre Baskerville", serif';
+    ctx.fillStyle = type === 'root' ? WHITE : (type === 'head' ? BLUE : GOLD);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(init, ax, ay);
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.fillStyle = type === 'root' ? WHITE : TEXT;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    // Clip long names
+    const maxW = NW - 44;
+    let n = name;
+    ctx.font = '600 11px Inter, sans-serif';
+    while (ctx.measureText(n).width > maxW && n.length > 3) n = n.slice(0,-1);
+    if (n !== name) n = n.slice(0,-1) + '…';
+    ctx.fillText(n, x+40, y+NH/2-8);
+    ctx.font = '400 10px Inter, sans-serif';
+    ctx.fillStyle = type === 'root' ? 'rgba(255,255,255,0.6)' : MUTED;
+    let t = title;
+    while (ctx.measureText(t).width > maxW && t.length > 3) t = t.slice(0,-1);
+    if (t !== title) t = t.slice(0,-1) + '…';
+    ctx.fillText(t, x+40, y+NH/2+8);
+  }
+
+  // Layout
+  // Row 0: Superintendent
+  const r0x = W/2 - NW/2, r0y = 18;
+  // Row 1: Principal
+  const r1x = W/2 - NW/2, r1y = r0y + NH + 44;
+  // Row 2: Program Director
+  const r2x = W/2 - NW/2, r2y = r1y + NH + 44;
+  // Row 3: 3 roles side by side
+  const gap3 = 24, totalW3 = 3*NW + 2*gap3;
+  const s3 = (W - totalW3)/2;
+  const r3xs = [s3, s3+NW+gap3, s3+2*(NW+gap3)];
+  const r3y = r2y + NH + 44;
+  // Row 4: 12 student interpreters (4 per group under each row3 node)
+  const SNW = 130, SNH = 44;
+  const r4y = r3y + NH + 38;
+
+  // Draw lines first
+  // r0 → r1
+  const midY01 = r0y + NH + 22;
+  line(r0x+NW/2, r0y+NH, r0x+NW/2, midY01);
+  line(r0x+NW/2, midY01, r1x+NW/2, midY01);
+  line(r1x+NW/2, midY01, r1x+NW/2, r1y);
+  // r1 → r2
+  const midY12 = r1y + NH + 22;
+  line(r1x+NW/2, r1y+NH, r1x+NW/2, midY12);
+  line(r1x+NW/2, midY12, r2x+NW/2, midY12);
+  line(r2x+NW/2, midY12, r2x+NW/2, r2y);
+  // r2 → r3 (fan)
+  const hBar3y = r2y + NH + 22;
+  line(r2x+NW/2, r2y+NH, r2x+NW/2, hBar3y);
+  line(r3xs[0]+NW/2, hBar3y, r3xs[2]+NW/2, hBar3y);
+  r3xs.forEach(x => line(x+NW/2, hBar3y, x+NW/2, r3y));
+
+  // r3 → r4 (2 students each)
+  const groups = [
+    ['M. Gutierrez','F. Ahmed','L. Ramirez','C. Morales'],
+    ['Y. Hassan','J. Desir','A. Okafor','P. Nguyen'],
+    ['S. Martinez','R. Patel','T. Wolde','K. Diallo'],
+  ];
+  r3xs.forEach((hx, gi) => {
+    const hcx = hx + NW/2;
+    const subTotalW = 2*SNW + 8;
+    const subStart = hcx - subTotalW/2;
+    const subXs = [subStart, subStart+SNW+8];
+    const barY4 = r3y + NH + 18;
+    line(hcx, r3y+NH, hcx, barY4);
+    line(subXs[0]+SNW/2, barY4, subXs[1]+SNW/2, barY4);
+    subXs.forEach((sx,si) => {
+      line(sx+SNW/2, barY4, sx+SNW/2, r4y);
+      // draw sub node
+      ctx.shadowColor = 'rgba(0,0,0,0.05)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 1;
+      ctx.beginPath(); ctx.rect(sx, r4y, SNW, SNH); ctx.fillStyle = WHITE; ctx.fill();
+      ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+      ctx.strokeStyle = RULE; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#DDE2EE'; ctx.fillRect(sx, r4y, 2, SNH);
+      const sName = groups[gi][si*1] || '—';
+      ctx.font = '600 10px Inter, sans-serif'; ctx.fillStyle = TEXT;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(sName, sx+10, r4y+SNH/2-7);
+      ctx.font = '400 9.5px Inter, sans-serif'; ctx.fillStyle = MUTED;
+      ctx.fillText('Student Interpreter', sx+10, r4y+SNH/2+7);
+    });
+  });
+
+  // Draw nodes on top
+  node(r0x, r0y, 'Dr. M. Richards', 'Superintendent, HCPS', 'root');
+  node(r1x, r1y, 'Mr. J. Chen', 'Principal, HHS', 'head');
+  node(r2x, r2y, 'Dr. R. Mills', 'Program Director', 'head');
+  const r3titles = ['Spanish Coord.','Arabic & Somali Coord.','Other Languages Coord.'];
+  const r3names  = ['Mr. T. Kaur','Ms. S. Patel','Ms. A. Osei'];
+  r3xs.forEach((x,i) => node(x, r3y, r3names[i], r3titles[i], 'sub'));
+}
+</script>
+</body>
+</html>
