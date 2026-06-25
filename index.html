@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HCPS Interpreter Admin Portal</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; display: flex; }
+        sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; padding: 20px; }
+        main { flex: 1; padding: 20px; background: #ecf0f1; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #34495e; color: white; }
+    </style>
+</head>
+<body>
+    <sidebar>
+        <h2>HCPS Portal</h2>
+        <p>Logged in as Administrator</p>
+    </sidebar>
+    <main>
+        <h1>Active Interpreter Requests</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parent Name</th>
+                    <th>Language</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data will load here automatically -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        const API_URL = "YOUR_FREE_API_ENDPOINT_HERE";
+
+        async function loadRequests() {
+            const response = await fetch(API_URL);
+            const requests = await response.json();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            requests.forEach(req => {
+                const row = `<tr>
+                    <td>${req.parentName}</td>
+                    <td>${req.language}</td>
+                    <td>${req.date}</td>
+                    <td><strong>${req.status}</strong></td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+        
+        // Load data on page open
+        loadRequests();
+    </script>
+</body>
+</html>
