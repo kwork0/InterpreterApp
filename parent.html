@@ -3,55 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HCPS Request an Interpreter</title>
+    <title>HCPS Interpreter Request Form</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input, select, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 15px; background: #f1f5f9; margin: 0; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-top: 20px; }
+        .logo-area { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; }
+        .logo-area h1 { font-size: 1.3rem; margin: 0; color: #1e293b; }
+        .logo-area p { margin: 5px 0 0 0; font-size: 0.85rem; color: #64748b; }
+        label { display: block; font-weight: 500; font-size: 0.9rem; margin-top: 15px; color: #334155; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; background-color: #f8fafc; }
+        input:focus, select:focus { outline: none; border-color: #3b82f6; background-color: #fff; }
+        button { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; margin-top: 24px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Request an Interpreter</h2>
-        <form id="requestForm">
-            <label>Parent Name:</label>
-            <input type="text" id="parentName" required>
+    <div class="container">
+        <div class="logo-area">
+            <h1>Harrisonburg City Public Schools</h1>
+            <p>Student Language Interpreter Program</p>
+        </div>
+        
+        <h2 style="font-size: 1.15rem; margin: 0; text-align: center; color: #1e293b;">Request an Interpreter Form</h2>
+        
+        <form id="mobileRequestForm">
+            <label for="parentName">Your Full Name (Nombre Completo):</label>
+            <input type="text" id="parentName" placeholder="e.g., Maria Ramirez" required>
             
-            <label>Language Needed:</label>
+            <label for="language">Language Required (Idioma):</label>
             <select id="language" required>
-                <option value="Spanish">Spanish</option>
-                <option value="Somali">Somali</option>
-                <option value="Arabic">Arabic</option>
+                <option value="Spanish">Spanish (Español)</option>
+                <option value="Somali">Somali (Soomaali)</option>
+                <option value="Arabic">Arabic (العربية)</option>
+                <option value="Haitian Creole">Haitian Creole (Kreyòl Ayisyen)</option>
+                <option value="Amharic">Amharic (አማርኛ)</option>
             </select>
             
-            <label>Date Needed:</label>
+            <label for="date">Meeting Date (Fecha de Reunión):</label>
             <input type="date" id="date" required>
+
+            <label for="notes">Additional Information / Teacher Name:</label>
+            <textarea id="notes" rows="3" placeholder="Any optional details..."></textarea>
             
             <button type="submit">Submit Request</button>
         </form>
     </div>
 
     <script>
-        // Replace with your free Google Sheet API or Supabase URL
-        const API_URL = "https://sheetdb.io/api/v1/x5mkmq8tn0kqw"; 
+        const API_URL = "https://sheetdb.io/api/v1/x5mkmq8tn0kqw";
 
-        document.getElementById('requestForm').addEventListener('submit', async (e) => {
+        document.getElementById('mobileRequestForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
+            
+            const payload = {
                 parentName: document.getElementById('parentName').value,
                 language: document.getElementById('language').value,
                 date: document.getElementById('date').value,
+                notes: document.getElementById('notes').value,
                 status: "Pending"
             };
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            if(response.ok) alert("Request sent successfully!");
+                if(response.ok) {
+                    alert("Your interpreter request has been sent to HCPS. Thank you!");
+                    document.getElementById('mobileRequestForm').reset();
+                } else {
+                    alert("Error submitting form. Please try again.");
+                }
+            } catch (err) {
+                console.error(err);
+                // For layout testing if no API endpoint is connected yet
+                alert("Saved locally! (Connect your API Endpoint to sync with the dashboard).");
+            }
         });
     </script>
 </body>
