@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCPS Request an Interpreter</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, select, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Request an Interpreter</h2>
+        <form id="requestForm">
+            <label>Parent Name:</label>
+            <input type="text" id="parentName" required>
+            
+            <label>Language Needed:</label>
+            <select id="language" required>
+                <option value="Spanish">Spanish</option>
+                <option value="Somali">Somali</option>
+                <option value="Arabic">Arabic</option>
+            </select>
+            
+            <label>Date Needed:</label>
+            <input type="date" id="date" required>
+            
+            <button type="submit">Submit Request</button>
+        </form>
+    </div>
+
+    <script>
+        // Replace with your free Google Sheet API or Supabase URL
+        const API_URL = "YOUR_FREE_API_ENDPOINT_HERE"; 
+
+        document.getElementById('requestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                parentName: document.getElementById('parentName').value,
+                language: document.getElementById('language').value,
+                date: document.getElementById('date').value,
+                status: "Pending"
+            };
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if(response.ok) alert("Request sent successfully!");
+        });
+    </script>
+</body>
+</html>
