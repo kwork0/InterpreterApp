@@ -67,10 +67,10 @@
     <h2>HCPS Interpreter Portal</h2> 
     <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: -10px; padding-bottom: 10px;">Harrisonburg City Public Schools</p> 
     <nav> 
-        <a onclick="switchSection('schedule-sec', this)" class="active">📋 Daily Schedule</a> 
-        <a onclick="switchSection('conference-sec', this)">📅 Conference Days</a> 
-        <a onclick="switchSection('task-sec', this)">✅ Task Board</a> 
-        <a onclick="switchSection('directory-sec', this)">👥 Program Directory</a> 
+        <a onclick="switchSection('schedule-sec', this)" class="active">Daily Schedule</a> 
+        <a onclick="switchSection('conference-sec', this)">Conference Days</a> 
+        <a onclick="switchSection('task-sec', this)">Task Board</a> 
+        <a onclick="switchSection('directory-sec', this)">Program Directory</a> 
     </nav> 
 </sidebar>
 
@@ -95,14 +95,13 @@
                 <span style="font-size: 0.8rem; color: #10b981;">On track for 12 hrs</span> 
             </div> 
             <div class="stat-card" style="border-left-color: #8b5cf6;"> 
-                <h3>Total Hours (Semester)</h3> 
+                <h3>Total Interpreting Hours</h3> 
                 <p>86</p> 
                 <span style="font-size: 0.8rem; color: #8b5cf6;">12 hrs ahead of goal</span> 
             </div> 
             <div class="stat-card" style="border-left-color: #f59e0b;"> 
-                <h3>Languages Active</h3> 
-                <p>3</p> 
-                <span style="font-size: 0.8rem; color: #64748b;">Spanish, Somali, Arabic</span> 
+                <h3>Designated language</h3> 
+                <p>Spanish</p> 
             </div> 
         </div> 
 
@@ -118,16 +117,16 @@
                             </tr> 
                         </thead> 
                         <tbody> 
-                            <tr> <td><b>P1</b></td><td>8:05 – 8:55</td><td>Room 114</td><td>Ms. Delgado</td><td>Spanish</td><td><span class="status complete">Complete</span></td> </tr> 
-                            <tr> <td><b>P2</b></td><td>9:00 – 9:50</td><td>Room 208</td><td>Mr. Okonkwo</td><td>Somali</td><td><span class="status complete">Complete</span></td> </tr> <tr> <td><b>P4</b></td><td>11:05 – 11:55</td><td>Room 301</td><td>Dr. Mills</td><td>Spanish</td><td><span class="status progress">In Progress</span></td> </tr> 
-                            <tr> <td><b>P5</b></td><td>12:00 – 12:50</td><td>Room 115</td><td>Ms. Rivera</td><td>Arabic</td><td><span class="status upcoming">Upcoming</span></td> </tr> 
-                            <tr> <td><b>P7</b></td><td>2:05 – 2:55</td><td>Room 204</td><td>Mr. Chen</td><td>Spanish</td><td><span class="status upcoming">Upcoming</span></td> </tr> 
+                            <tr> <td><b>P1</b></td><td>8:05 – 8:55</td><td>Room 114</td><td>Ms. [Teacher]</td><td>[Language]</td><td><span class="status complete">Complete</span></td> </tr> 
+                            <tr> <td><b>P2</b></td><td>9:00 – 9:50</td><td>Room 208</td><td>Mr. [Teacher]</td><td>[Language]</td><td><span class="status complete">Complete</span></td> </tr> <tr> <td><b>P4</b></td><td>11:05 – 11:55</td><td>Room 301</td><td>Dr. Mills</td><td>Spanish</td><td><span class="status progress">In Progress</span></td> </tr> 
+                            <tr> <td><b>P5</b></td><td>12:00 – 12:50</td><td>Room 115</td><td>Ms. [Teacher]</td><td>[Language]</td><td><span class="status upcoming">Upcoming</span></td> </tr> 
+                            <tr> <td><b>P7</b></td><td>2:05 – 2:55</td><td>Room 204</td><td>Mr. [Teacher]</td><td>[Language]</td><td><span class="status upcoming">Upcoming</span></td> </tr> 
                         </tbody> 
                     </table> 
 
                     <!-- Parent Requests Header with Dynamic Filter Search Input Element -->
                     <div class="section-title" style="color: #dc2626; display: flex; justify-content: space-between; align-items: center;"> 
-                        <span>📥 Incoming Parent Mobile Requests</span> 
+                        <span>Incoming Parent Mobile Requests</span> 
                         <input type="text" id="parentSearch" class="search-box" style="margin: 0;" placeholder="🔍 Search by name or language..." onkeyup="filterParentTable()"> 
                     </div> 
                     <table> 
@@ -144,15 +143,15 @@
                 <div> 
                     <div class="section-title">Supervised By</div> 
                     <div class="card" style="font-size: 0.85rem; line-height: 1.5;"> 
-                        <strong>Dr. Rebecca Mills</strong> (Program Director)<br> <span style="color: #64748b;">r.mills@hcps.k12.va.us</span><br><br> 
-                        <strong>Mr. Thomas Kaur</strong> (Program Coordinator)<br> <span style="color: #64748b;">t.kaur@hcps.k12.va.us</span> 
+                        <strong>Dr. Rebecca Mills</strong> (Program Director)<br> <span style="color: #64748b;">[user]@harrisonburg.k12.va.us</span><br><br> 
+                        <strong>Mr. Thomas Kaur</strong> (Program Coordinator)<br> <span style="color: #64748b;">[user]@harrisonburg.k12.va.us</span> 
                     </div> 
                 </div> 
             </div> 
         </div>
         <!-- BLOCK 4: SECTION 2 (CONFERENCE DAYS) & SECTION 3 (TASK BOARD) -->
         <div id="conference-sec" class="app-section"> 
-            <div class="section-title">📅 Upcoming Parent-Teacher Conference Days</div> 
+            <div class="section-title">Upcoming Parent-Teacher Conference Days</div> 
             <div class="card"> 
                 <h3>Fall Term Conferences</h3> 
                 <p><b>Date:</b> October 22, 2026 · <b>Time:</b> 4:00 PM - 7:00 PM</p> 
@@ -166,7 +165,7 @@
         </div> 
 
         <div id="task-sec" class="app-section"> 
-            <div class="section-title">✅ Active Task Board</div> 
+            <div class="section-title">Active Task Board</div> 
             <div class="card" style="max-width: 600px;"> 
                 <div class="task-item"> 
                     <div style="font-weight: 600; font-size: 0.9rem;">Complete Ethics Training Module</div> 
@@ -184,7 +183,7 @@
         <!-- BLOCK 5: SECTION 4 - PROGRAM DIRECTORY DESIGN --> 
         <div id="directory-sec" class="app-section"> 
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;"> 
-                <span>👥 Staff & Interpreter Directory</span> 
+                <span>Staff & Interpreter Directory</span> 
                 <input type="text" id="dirSearch" class="search-box" style="margin: 0;" placeholder="🔍 Search directory..." onkeyup="filterDirectoryTable()"> 
             </div> 
             <table id="directoryTable"> 
@@ -194,11 +193,11 @@
                     </tr> 
                 </thead> 
                 <tbody> 
-                    <tr> <td><b>Dr. Rebecca Mills</b></td> <td>Program Director</td> <td>r.mills@hcps.k12.va.us</td> </tr> 
-                    <tr> <td><b>Mr. Thomas Kaur</b></td> <td>Program Coordinator</td> <td>t.kaur@hcps.k12.va.us</td> </tr> 
-                    <tr> <td><b>Elena Rostova</b></td> <td>Spanish Interpreter</td> <td>e.rostova@hcps.k12.va.us</td> </tr> 
-                    <tr> <td><b>Amir Al-Mansoor</b></td> <td>Arabic Interpreter</td> <td>a.almansoor@hcps.k12.va.us</td> </tr> 
-                    <tr> <td><b>Mohamed Farah</b></td> <td>Somali Interpreter</td> <td>m.farah@hcps.k12.va.us</td> </tr> 
+                    <tr> <td><b>Dr. [Teacher] </b></td> <td>Program Director</td> <td>[USER]@harrisonburg.k12.va.us</td> </tr> 
+                    <tr> <td><b>Mr. [Teacher] </b></td> <td>Program Coordinator</td> <td>[USER]@harrisonburg.k12.va.us</td> </tr> 
+                    <tr> <td><b>[Teacher] </b></td> <td>Spanish Interpreter</td> <td>[USER]@harrisonburg.k12.va.us</td> </tr> 
+                    <tr> <td><b>[Teacher] </b></td> <td>Arabic Interpreter</td> <td>[USER]@harrisonburg.k12.va.us</td> </tr> 
+                    <tr> <td><b>[Teacher] </b></td> <td>Somali Interpreter</td> <td>[USER]@harrisonburg.k12.va.us</td> </tr> 
                 </tbody> 
             </table> 
         </div> 
