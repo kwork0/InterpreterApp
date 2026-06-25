@@ -5,35 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>HCPS Interpreter Admin Portal</title> 
     <style> 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; display: flex; background-color: #f8f9fa; color: #333; } 
-        sidebar { width: 260px; background: #1e293b; color: white; min-height: 100vh; padding: 20px; box-sizing: border-box; position: fixed; } 
-        sidebar h2 { font-size: 1.2rem; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-top: 0; } 
-        sidebar nav a { display: block; color: #cbd5e1; padding: 12px 10px; text-decoration: none; font-size: 0.95rem; border-radius: 6px; margin-bottom: 5px; cursor: pointer; } 
-        sidebar nav a:hover, sidebar nav a.active { color: white; background: #334155; } 
-        main { flex: 1; padding: 30px; box-sizing: border-box; max-width: 1200px; margin-left: 260px; } 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; } 
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; } 
-        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 4px solid #3b82f6; } 
-        .stat-card h3 { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; } 
-        .stat-card p { margin: 10px 0 0 0; font-size: 1.8rem; font-weight: bold; color: #1e293b; } 
-        .section-title { font-size: 1.25rem; color: #1e293b; margin: 30px 0 15px 0; font-weight: 600; } 
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; } 
-        th, td { padding: 14px 20px; text-align: left; font-size: 0.9rem; } 
-        th { background: #f1f5f9; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; } 
-        tr { border-bottom: 1px solid #f1f5f9; } 
-        .status { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; } 
-        .status.complete { background: #dcfce7; color: #15803d; } 
-        .status.progress { background: #dbeafe; color: #1d4ed8; } 
-        .status.upcoming { background: #fef9c3; color: #a16207; } 
-        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; } 
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; } 
-        .task-item { border-bottom: 1px solid #f1f5f9; padding: 12px 0; } 
-        .task-item:last-child { border: none; } 
-        .task-tag { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; } 
-        .search-box { width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; box-sizing: border-box; } 
-        .app-section { display: none; } 
-        .app-section.active { display: block; } 
-    </style> 
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; display: flex; background-color: #f4f6f9; color: #333; } 
+    
+    /* Updated Background to HCPS Deep District Blue */
+    sidebar { width: 260px; background: #102542; color: white; min-height: 100vh; padding: 20px; box-sizing: border-box; position: fixed; } 
+    sidebar h2 { font-size: 1.2rem; border-bottom: 1px solid #233d60; padding-bottom: 15px; margin-top: 0; } 
+    sidebar nav a { display: block; color: #cbd5e1; padding: 12px 10px; text-decoration: none; font-size: 0.95rem; border-radius: 6px; margin-bottom: 5px; cursor: pointer; } 
+    
+    /* Updated Hover & Active to HCPS Golden Orange */
+    sidebar nav a:hover, sidebar nav a.active { color: white; background: #f39200; } 
+    
+    main { flex: 1; padding: 30px; box-sizing: border-box; max-width: 1200px; margin-left: 260px; } 
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; } 
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; } 
+    
+    /* Updated Stat Cards with Custom Brand Border Accents */
+    .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); } 
+    .stats-grid .stat-card:nth-child(1) { border-left: 4px solid #102542; } /* Blue */
+    .stats-grid .stat-card:nth-child(2) { border-left: 4px solid #f39200; } /* Orange */
+    .stats-grid .stat-card:nth-child(3) { border-left: 4px solid #00a099; } /* Teal */
+    .stats-grid .stat-card:nth-child(4) { border-left: 4px solid #8a1c5c; } /* Magenta */
+    
+    .stat-card h3 { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; } 
+    .stat-card p { margin: 10px 0 0 0; font-size: 1.8rem; font-weight: bold; color: #102542; } 
+    
+    /* Updated Titles to Deep District Blue with a Teal bottom line accent */
+    .section-title { font-size: 1.25rem; color: #102542; margin: 30px 0 15px 0; font-weight: 600; border-bottom: 2px solid #00a099; padding-bottom: 6px; } 
+    
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; } 
+    th, td { padding: 14px 20px; text-align: left; font-size: 0.9rem; } 
+    th { background: #f1f5f9; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; } 
+    tr { border-bottom: 1px solid #f1f5f9; } 
+    
+    /* Custom status pill tag badge accents */
+    .status { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; } 
+    .status.complete { background: #dcfce7; color: #15803d; } 
+    .status.progress { background: #dbeafe; color: #1d4ed8; } 
+    .status.upcoming { background: #fef9c3; color: #a16207; } 
+    
+    .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; } 
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; } 
+    .task-item { border-bottom: 1px solid #f1f5f9; padding: 12px 0; } 
+    .task-item:last-child { border: none; } 
+    .task-tag { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; } 
+    .search-box { width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; box-sizing: border-box; } 
+    .app-section { display: none; } 
+    .app-section.active { display: block; } 
+</style>
 </head>
 <body> 
     <!-- BLOCK 2: NAVIGATION SIDEBAR & LAYOUT HEADER -->
