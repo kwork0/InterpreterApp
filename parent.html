@@ -68,12 +68,13 @@
                 const data = await response.json();
                 
                 if (data && data.authorized === true) {
-                    sessionStorage.setItem("hcps_user", JSON.stringify({
-                        email: emailInput,
-                        name: data.userName || "District Interpreter"
-                    }));
-                    window.location.href = "index.html";
-                } else {
+    sessionStorage.setItem("hcps_user", JSON.stringify({
+        email: emailInput,
+        name: data.userName || "District User",
+        role: data.userRole || "Interpreter" // Saves the role dynamically
+    }));
+    window.location.href = "index.html";
+} else {
                     throw new Error("Unauthorized");
                 }
             } catch (err) { 
