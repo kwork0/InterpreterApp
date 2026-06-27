@@ -33,7 +33,6 @@
         
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0;">
         
-        <!-- Document requirement string placed on the middle top area -->
         <div class="prompt-msg">Welcome, please login to continue:</div> 
         
         <form id="authLoginForm"> 
@@ -47,7 +46,7 @@
         </form> 
 
         <div class="hint-text">
-            Testing Mode: Please verify that your credentials exist on the roster spreadsheet to proceed to the main interpreter assignment schedule dashboard.
+            Testing Mode: Please verify that your credentials exist on the roster spreadsheet to proceed.
         </div>
     </div> 
     
@@ -56,7 +55,6 @@
         
         document.getElementById('authLoginForm').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
-            
             const emailInput = document.getElementById('userEmail').value.trim();
             const submitBtn = document.getElementById('submitBtn');
             const errorLbl = document.getElementById('errorMsg');
@@ -66,23 +64,18 @@
             submitBtn.disabled = true;
             
             try { 
-                // Requests login lookup action framework from the spreadsheet macro deployment
                 const response = await fetch(`${API_URL}?action=loginCheck&email=${encodeURIComponent(emailInput)}`);
                 const data = await response.json();
                 
                 if (data && data.authorized === true) {
-                    // Cache the verified user object payload into the session browser data frame
                     sessionStorage.setItem("hcps_user", JSON.stringify({
                         email: emailInput,
                         name: data.userName || "District Interpreter"
                     }));
-                    
-                    // Proceed straight into dashboard view environment 
                     window.location.href = "index.html";
                 } else {
                     throw new Error("Unauthorized");
                 }
-                
             } catch (err) { 
                 console.error(err); 
                 errorLbl.style.display = "block";
