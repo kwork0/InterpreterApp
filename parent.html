@@ -22,6 +22,12 @@
         .error-lbl { color: #dc2626; font-size: 0.85rem; margin-top: 12px; font-weight: 500; display: none; }
         .hint-text { font-size: 0.75rem; color: #94a3b8; margin-top: 24px; line-height: 1.4; }
     </style> 
+    <script>
+        // Forward to dashboard if already logged in
+        if (sessionStorage.getItem("hcps_user")) {
+            window.location.href = "index.html";
+        }
+    </script>
 </head> 
 <body> 
     <div class="container"> 
@@ -38,7 +44,7 @@
         <form id="authLoginForm"> 
             <div class="input-group">
                 <label for="userEmail">District Email Address</label> 
-                <input type="email" id="userEmail" placeholder="username@harrisonburg.k12.va.us" required> 
+                <input type="email" id="userEmail" placeholder="username@harrisonburg.k12.va.us" pattern="[a-z0-9._%+-]+@harrisonburg\.k12\.va\.us$" title="Please use your authorized @harrisonburg.k12.va.us school email address." required> 
             </div>
             
             <button type="submit" id="submitBtn">Sign In</button> 
@@ -68,13 +74,13 @@
                 const data = await response.json();
                 
                 if (data && data.authorized === true) {
-    sessionStorage.setItem("hcps_user", JSON.stringify({
-        email: emailInput,
-        name: data.userName || "District User",
-        role: data.userRole || "Interpreter" // Saves the role dynamically
-    }));
-    window.location.href = "index.html";
-} else {
+                    sessionStorage.setItem("hcps_user", JSON.stringify({
+                        email: emailInput,
+                        name: data.userName || "District Interpreter",
+                        role: data.userRole || "Interpreter"
+                    }));
+                    window.location.href = "index.html";
+                } else {
                     throw new Error("Unauthorized");
                 }
             } catch (err) { 
