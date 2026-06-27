@@ -1,313 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HCPS Interpreter Portal - Gateway</title>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --bg-dark: #0b0f19;
+        --hcps-blue: #0b2240;
+        --hcps-gold: #cca43b;
+        --dark-bg: #0f172a;
         --card-bg: #1e293b;
-        --border-color: #334155;
-        --hcps-blue: #0284c7;
-        --hcps-gold: #f59e0b;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
+        --border-color: #334155;
       }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      body {
-        background-color: var(--bg-dark);
-        color: var(--text-main);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-
-      .auth-container {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        width: 100%;
-        max-width: 450px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-
-      .app-workspace {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        max-width: 1200px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 2rem;
-        gap: 1.5rem;
-      }
-
-      .header-block {
-        text-align: center;
-      }
-
-      .logo-subtext {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--hcps-gold);
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
-
-      .main-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--text-main);
-      }
-
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-      }
-
-      label {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-
-      .input-field {
-        background: #0f172a;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 0.75rem 1rem;
-        color: var(--text-main);
-        font-size: 1rem;
-        width: 100%;
-        transition: border-color 0.2s;
-      }
-
-      .input-field:focus {
-        outline: none;
-        border-color: var(--hcps-blue);
-      }
-
-      .action-btn {
-        background: var(--hcps-gold);
-        color: #000;
-        font-weight: 600;
-        border: none;
-        border-radius: 6px;
-        padding: 0.85rem;
-        font-size: 1rem;
-        cursor: pointer;
-        width: 100%;
-        transition: opacity 0.2s;
-      }
-
-      .action-btn:hover {
-        opacity: 0.9;
-      }
-
-      .error-banner {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        color: #f87171;
-        padding: 0.75rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        text-align: center;
-        display: none;
-      }
-
-      .workspace-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 1rem;
-      }
-
-      .user-badge {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .role-label {
-        background: var(--hcps-blue);
-        color: white;
-        font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-      }
-
-      .grid-layout {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-      }
-
-      .dashboard-card {
-        background: #0f172a;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-      }
-
-      .card-title {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
-      }
-
-      .metric-value {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--text-main);
-      }
-
-      .table-container {
-        width: 100%;
-        overflow-x: auto;
-        margin-top: 1rem;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-        font-size: 0.9rem;
-      }
-
-      th {
-        background: #1e293b;
-        color: var(--text-muted);
-        padding: 10px 12px;
-        font-weight: 600;
-        border-bottom: 2px solid var(--border-color);
-      }
-
-      td {
-        padding: 12px;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-main);
-      }
-
-      .status-select {
-        background: #0f172a;
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-        padding: 4px 8px;
-        border-radius: 4px;
-      }
-
-      .diagnostic-log {
-        background: #020617;
-        font-family: monospace;
-        padding: 1rem;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        color: #38bdf8;
-        font-size: 0.85rem;
-        max-height: 200px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-      }
-
-      .demo-click-prompt {
-        color: var(--hcps-gold);
-        text-decoration: underline;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.75);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        z-index: 999;
-      }
-
-      .modal-box {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 2rem;
-        width: 100%;
-        max-width: 500px;
-        position: relative;
-      }
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+      body { background-color: var(--dark-bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+      
+      /* Login Window Container Styling */
+      .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 2rem; }
+      .logo-header { max-width: 480px; width: 100%; height: auto; margin-bottom: 1.5rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+      .welcome-text { font-size: 1.25rem; font-weight: 500; color: var(--text-main); margin-bottom: 2rem; letter-spacing: 0.5px; }
+      
+      .login-box { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); text-align: center; }
+      .input-field { width: 100%; padding: 0.85rem 1rem; background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 1rem; margin-bottom: 1.5rem; outline: none; transition: all 0.2s; }
+      .input-field:focus { border-color: var(--hcps-gold); box-shadow: 0 0 0 2px rgba(204,164,59,0.2); }
+      
+      .google-btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; background-color: white; color: #1e293b; font-weight: 600; padding: 0.85rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      .google-btn:hover { background-color: #f1f5f9; transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+      .google-btn:active { transform: translateY(0); }
+      .google-icon { width: 20px; height: 20px; }
+      
+      /* Base Framework Shell Styles */
+      .app-wrapper { display: none; flex-direction: column; width: 100%; min-height: 100vh; }
+      header { background-color: var(--hcps-blue); border-bottom: 3px solid var(--hcps-gold); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+      .brand-title { font-weight: 700; font-size: 1.3rem; color: white; display: flex; align-items: center; gap: 10px; }
+      .user-badge { background: rgba(255,255,255,0.1); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); }
+      .logout-link { color: var(--hcps-gold); cursor: pointer; font-weight: 500; font-size: 0.9rem; text-decoration: none; margin-left: 15px; }
+      .logout-link:hover { text-decoration: underline; }
+      
+      main { padding: 2rem; flex: 1; width: 100%; max-width: 1400px; margin: 0 auto; }
+      .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+      .dashboard-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+      .card-title { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+      .metric-value { font-size: 2.25rem; font-weight: 700; color: white; }
+      
+      /* Layout Tables */
+      .table-container { width: 100%; overflow-x: auto; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; margin-top: 1.5rem; }
+      table { width: 100%; border-collapse: collapse; text-align: left; }
+      th { background-color: #111827; padding: 1rem; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+      td { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #e2e8f0; }
+      tr:last-child td { border-bottom: none; }
+      
+      /* Status Interactivity Dropdown Configuration */
+      .status-select { background-color: #0f172a; border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; outline: none; cursor: pointer; transition: all 0.2s; }
+      .status-select:focus { border-color: var(--hcps-gold); }
+      
+      /* Form Layout Design Modifiers */
+      .form-group { margin-bottom: 1.25rem; }
+      .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem; }
+      .action-btn { background-color: var(--hcps-gold); color: var(--hcps-blue); border: none; padding: 0.75rem 1.5rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.2s; width: 100%; font-size: 1rem; }
+      .action-btn:hover { background-color: #bfa032; }
+      
+      /* Centered Rectangular Schedule Demo Modal Overlay Layout */
+      .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+      .modal-rectangle { background: var(--card-bg); border: 2px solid var(--hcps-gold); border-radius: 12px; width: 100%; max-width: 680px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; }
+      .modal-header { background: #111827; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+      .modal-header h3 { font-size: 1.1rem; font-weight: 600; color: white; }
+      .close-modal { font-size: 1.5rem; color: var(--text-muted); cursor: pointer; background: none; border: none; outline: none; }
+      .close-modal:hover { color: white; }
+      .modal-body { padding: 1.5rem; }
+      .demo-notice { background: rgba(204,164,59,0.1); border-left: 4px solid var(--hcps-gold); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0; margin-bottom: 1.5rem; }
+      .demo-click-prompt { color: var(--hcps-gold); text-decoration: underline; cursor: pointer; font-weight: 500; font-size: 0.95rem; }
+      
+      /* Diagnostic Logging Elements for Tech Section */
+      .diagnostic-log { background: #020617; border: 1px solid #1e293b; border-radius: 6px; padding: 1rem; font-family: monospace; font-size: 0.8rem; color: #4ade80; height: 180px; overflow-y: auto; margin-top: 1rem; line-height: 1.5; }
     </style>
   </head>
   <body>
 
-    <div class="auth-container" id="loginSection">
-      <div class="header-block">
-        <div class="logo-subtext">Harrisonburg City Public Schools</div>
-        <h1 class="main-title">Student Language Interpreter Portal</h1>
+    <!-- 1. ENTRANCE SCREEN (AUTHENTICATION VIEW) -->
+    <div id="loginSection" class="login-container">
+      <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" alt="HCPS Logo" class="logo-header">
+      <div class="welcome-text">Welcome, please login to continue:</div>
+      <div class="login-box">
+        <input type="email" id="userEmail" class="input-field" placeholder="Enter school email or use credentials..." required>
+        <button type="button" class="google-btn" onclick="handleAuthSubmit()">
+          <svg class="google-icon" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with HCPS Account
+        </button>
       </div>
-      <div class="error-banner" id="errorMessage"></div>
-      <div class="form-group">
-        <label for="userEmail">District Email Address</label>
-        <input type="email" id="userEmail" class="input-field" placeholder="username@harrisonburg.k12.va.us"/>
-      </div>
-      <button type="button" class="action-btn" onclick="handleAuthSubmit()">SIGN IN</button>
     </div>
 
-    <div class="app-workspace" id="appWorkspace">
-      <div class="workspace-header">
-        <div class="user-badge">
-          <span class="role-label" id="roleLabel">Awaiting Verification</span>
-          <span id="userNameText" style="font-weight: 500;">Resolving Context Profile...</span>
+    <!-- 2. APPLICATION RUNTIME CONTAINER FRAMEWORK -->
+    <div id="appWorkspace" class="app-wrapper">
+      <header>
+        <div class="brand-title">
+          <span>HCPS Enterprise Workspace</span>
+          <span id="roleLabel" class="user-badge">Role</span>
         </div>
-        <button class="action-btn" style="width:auto; padding: 0.5rem 1rem; background:#334155; color:white;" onclick="logoutSession()">Sign Out</button>
-      </div>
-      <div id="viewContainer"></div>
-    </div>
-
-    <div class="modal-overlay" id="demoModal">
-      <div class="modal-box">
-        <h3 style="margin-bottom:1rem; color:var(--hcps-gold);">Interactive Simulator</h3>
-        <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.5; margin-bottom:1.5rem;">
-          No active assignments found. Simulate a live status update to write parameters to **Sheet2 (Column J)**.
-        </p>
-        <div class="form-group">
-          <label>Update Live Status State</label>
-          <select class="input-field" style="background:#0f172a;" onchange="handleDemoStatusChange(this.value); toggleDemoModal(false);">
-            <option value="">-- Choose Option --</option>
-            <option value="Completed">Completed</option>
-            <option value="Parent Not Present">Parent Not Present</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        <div>
+          <span id="userNameText" style="font-size:0.9rem; color: #cbd5e1;">Loading Session...</span>
+          <a class="logout-link" onclick="logoutSession()">Sign Out</a>
         </div>
-        <button class="action-btn" style="background:#334155; color:white; margin-top:1rem;" onclick="toggleDemoModal(false)">Close Window</button>
+      </header>
+
+      <main id="viewContainer">
+        <!-- View layouts will be injected based on active verified profile routing -->
+      </main>
+    </div>
+
+    <!-- 3. CENTERED RECTANGULAR SCHEDULE DEMO MODAL POP-UP LAYER -->
+    <div id="demoModal" class="modal-backdrop">
+      <div class="modal-rectangle">
+        <div class="modal-header">
+          <h3>Simulation Workspace: Today's Assignment Demo</h3>
+          <button class="close-modal" onclick="toggleDemoModal(false)">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="demo-notice">
+            <strong>Viewing Live Mock Environment:</strong> Standard assignment parameters are currently offline for this account interface. You can manipulate status variables below to verify routing infrastructure.
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Teacher Assignment</th>
+                  <th>Periods</th>
+                  <th>Time Frame</th>
+                  <th>Room Assignment</th>
+                  <th>Execution Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Ms. Davis [Teacher]</td>
+                  <td>Period 2 - 3</td>
+                  <td>09:15 AM - 11:30 AM</td>
+                  <td>Room 204</td>
+                  <td>
+                    <select class="status-select" onchange="handleDemoStatusChange(this.value)">
+                      <option value="">Select Option</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Parent Not Present">Parent Not Present</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Mr. Albright [Teacher]</td>
+                  <td>Period 5</td>
+                  <td>01:00 PM - 02:15 PM</td>
+                  <td>Auditorium B</td>
+                  <td>
+                    <select class="status-select" onchange="handleDemoStatusChange(this.value)">
+                      <option value="">Select Option</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Parent Not Present">Parent Not Present</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- FRONTEND RUNTIME LAYER SCRIPTS -->
+    <!-- ========================================================================= -->
     <script>
       var sessionUserData = null;
-      var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkI4i-Ys0izkWsWeZKGZOBWcRV_u/exec";
 
       window.onload = function() {
         var cached = sessionStorage.getItem("hcps_secure_session");
@@ -319,38 +188,30 @@
 
       function handleAuthSubmit() {
         var emailInput = document.getElementById("userEmail").value.trim();
-        var errorMsgEl = document.getElementById("errorMessage");
-        if (errorMsgEl) errorMsgEl.style.display = "none";
-
         if(!emailInput) {
-          alert("Please type your school-affiliated email address.");
+          alert("Please type your school-affiliated email address to proceed.");
           return;
         }
 
-        var standardizedEmail = emailInput.toLowerCase();
-        if(!standardizedEmail.endsWith("@harrisonburg.k12.va.us")) {
-          if (errorMsgEl) {
-            errorMsgEl.innerText = "Error: Invalid domain footprint context.";
-            errorMsgEl.style.display = "block";
-          }
+        if(!emailInput.toLowerCase().endsWith("@harrisonburg.k12.va.us")) {
+          alert("Error: Verification rejected. A valid @harrisonburg.k12.va.us account profile context is required.");
           return;
         }
 
-        fetch(`${WEB_APP_URL}?email=${encodeURIComponent(standardizedEmail)}`)
-          .then(function(res) { return res.json(); })
-          .then(function(res) {
-            if (res.success) {
-              sessionUserData = res;
-              sessionStorage.setItem("hcps_secure_session", JSON.stringify(res));
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              sessionUserData = response;
+              sessionStorage.setItem("hcps_secure_session", JSON.stringify(response));
               initializeRoleWorkspace();
             } else {
-              if (errorMsgEl) {
-                errorMsgEl.innerText = res.message;
-                errorMsgEl.style.display = "block";
-              }
+              alert(response.message);
             }
           })
-          .catch(function(err) { alert("API Connection error: " + err.toString()); });
+          .withFailureHandler(function(err) {
+            alert("Backend processing timeout/failure: " + err);
+          })
+          .authenticateUser(emailInput);
       }
 
       function logoutSession() {
@@ -365,63 +226,114 @@
       }
 
       function handleDemoStatusChange(val) {
-        if(!val || !sessionUserData) return;
-        fetch(`${WEB_APP_URL}?email=${encodeURIComponent(sessionUserData.email)}&status=${encodeURIComponent(val)}`)
-          .then(function(res) { return res.json(); })
-          .then(function(res) {
-             if(res.success) alert("Database Row transaction complete: " + val);
+        if(!val) return;
+        google.script.run
+          .withSuccessHandler(function(res) {
+             if(res.success) {
+               alert("Status variable updated successfully inside Sheet2 (Column J): " + val);
+             } else {
+               alert("Status sync message: " + res.error);
+             }
           })
-          .catch(function(err) { alert("Transmission failure: " + err.toString()); });
+          .updateAssignmentStatus(sessionUserData.email, val);
       }
 
       function initializeRoleWorkspace() {
         document.getElementById("loginSection").style.display = "none";
-        document.getElementById("appWorkspace").style.display = "flex";
-        document.getElementById("roleLabel").innerText = sessionUserData.role;
-        document.getElementById("userNameText").innerText = sessionUserData.name + " (" + sessionUserData.email + ")";
+        
+        var appWorkspace = document.getElementById("appWorkspace");
+        appWorkspace.style.display = "flex";
+        
+        document.getElementById("roleLabel").innerText = sessionUserData.role + " Profile";
+        document.getElementById("userNameText").innerText = sessionUserData.name + " (" + sessionUserData.email + ") ";
 
-        var container = document.getElementById("viewContainer");
-        if (sessionUserData.role === "Interpreter") renderInterpreterDashboard(container);
-        else if (sessionUserData.role === "Admin") renderAdminDashboard(container);
-        else if (sessionUserData.role === "Coordinator") renderCoordinatorDashboard(container);
-        else if (sessionUserData.role === "Tech") renderTechDashboard(container);
+        var viewContainer = document.getElementById("viewContainer");
+        
+        if (sessionUserData.role === "Interpreter") {
+          renderInterpreterDashboard(viewContainer);
+        } else if (sessionUserData.role === "Admin") {
+          renderAdminDashboard(viewContainer);
+        } else if (sessionUserData.role === "Coordinator") {
+          renderCoordinatorDashboard(viewContainer);
+        } else if (sessionUserData.role === "Tech") {
+          renderTechDashboard(viewContainer);
+        }
       }
 
+      // =========================================================================
+      // INTERPRETER ACCESS VIEW INTERFACE
+      // =========================================================================
       function renderInterpreterDashboard(container) {
-        var scheduleBlock = sessionUserData.hasSchedule ? `
-          <div class="table-container">
-            <table>
-              <thead><tr><th>Teacher</th><th>Time Window</th><th>Status</th></tr></thead>
-              <tbody><tr><td>Active Location Assignment</td><td>Active Runtime Window</td><td>
-                <select class="status-select" onchange="handleDemoStatusChange(this.value)">
-                  <option value="">Select</option><option value="Completed">Completed</option>
-                  <option value="Parent Not Present">Parent Not Present</option><option value="Cancelled">Cancelled</option>
-                </select>
-              </td></tr></tbody>
-            </table>
-          </div>` : `
-          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 2rem; text-align: center; margin-top: 1rem;">
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">No current assignments found for today.</p>
-            <span class="demo-click-prompt" onclick="toggleDemoModal(true)">Click here to open Interactive Assignment Simulator</span>
-          </div>`;
+        var scheduleBlockHTML = '';
+        
+        if (sessionUserData.hasSchedule) {
+          scheduleBlockHTML = `
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Teacher Assignment</th>
+                    <th>Execution Slot Time</th>
+                    <th>Status Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Active Scheduled Location Assignment Reference</td>
+                    <td>Operational Routing Window Active</td>
+                    <td>
+                      <select class="status-select" onchange="handleDemoStatusChange(this.value)">
+                        <option value="">Select</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Parent Not Present">Parent Not Present</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>`;
+        } else {
+          scheduleBlockHTML = `
+            <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 2rem; text-align: center; margin-top: 1rem;">
+              <p style="color: var(--text-muted); margin-bottom: 1rem;">No current active assignments are published to your profile workspace today.</p>
+              <span class="demo-click-prompt" onclick="toggleDemoModal(true)">Click here to open the Interactive Assignment Schedule Simulation Template Window</span>
+            </div>`;
+        }
 
         container.innerHTML = `
           <div class="grid-layout">
-            <div class="dashboard-card"><div class="card-title">Hours Logged Previous Session</div><div class="metric-value">${sessionUserData.prevSessionHours || '0.00'} hrs</div></div>
-            <div class="dashboard-card"><div class="card-title">Total Interpreting Hours</div><div class="metric-value">${sessionUserData.totalHours || '0.00'} hrs</div></div>
-            <div class="dashboard-card"><div class="card-title">Language Asset</div><div class="metric-value" style="color: var(--hcps-gold); font-size: 1.8rem;">${sessionUserData.language || 'Pending'}</div></div>
+            <div class="dashboard-card">
+              <div class="card-title">Hours Logged This Previous Session</div>
+              <div class="metric-value">${sessionUserData.prevSessionHours || '0.00'} hrs</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Total Interpreting Hours</div>
+              <div class="metric-value">${sessionUserData.totalHours || '0.00'} hrs</div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Designated Language</div>
+              <div class="metric-value" style="color: var(--hcps-gold); font-size: 1.8rem;">${sessionUserData.language || 'Pending Assignment'}</div>
+            </div>
           </div>
-          <div class="dashboard-card" style="margin-top: 2rem;"><div class="card-title">Assignments Schedule</div>${scheduleBlock}</div>`;
+          <div class="dashboard-card" style="margin-top: 2rem;">
+            <div class="card-title">Today's Assignment Schedule</div>
+            ${scheduleBlockHTML}
+          </div>
+        `;
       }
 
+      // =========================================================================
+      // TEACHER / CLUB MANAGER ADMINISTRATIVE WORKSPACE (ALIGNED FOR SHEET2)
+      // =========================================================================
       function renderAdminDashboard(container) {
         container.innerHTML = `
           <div class="grid-layout" style="grid-template-columns: 1fr 2fr;">
             <div class="dashboard-card">
-              <div class="card-title">Create Assignment Slots</div>
+              <div class="card-title">Manage Members & Create Assignment Slots</div>
               <form id="assignmentForm" onsubmit="executeAssignmentPost(event)">
                 <div class="form-group">
-                  <label>Educational Facility</label>
+                  <label>Select Target District Educational Facility</label>
                   <select id="assignSchool" class="input-field" style="background:#0f172a; height:45px;" required>
                     <option value="Harrisonburg High School">Harrisonburg High School</option>
                     <option value="Rocktown High School">Rocktown High School</option>
@@ -435,23 +347,50 @@
                     <option value="Waterman Elementary School">Waterman Elementary School</option>
                   </select>
                 </div>
-                <div class="form-group"><label>Interpreter Email Lookup</label><input type="email" id="assignEmail" class="input-field" required></div>
-                <div class="form-group"><label>Teacher Reference Name</label><input type="text" id="assignTeacher" class="input-field" required></div>
+                <div class="form-group">
+                  <label>Interpreter Target School Email Lookup</label>
+                  <input type="email" id="assignEmail" class="input-field" placeholder="student@harrisonburg.k12.va.us" required>
+                </div>
+                <div class="form-group">
+                  <label>Staff Teacher Name Reference</label>
+                  <input type="text" id="assignTeacher" class="input-field" placeholder="e.g. Ms. Garcia" required>
+                </div>
                 <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                  <div><label>Start Time</label><input type="time" id="assignStart" class="input-field" required></div>
-                  <div><label>End Time</label><input type="time" id="assignEnd" class="input-field" required></div>
+                  <div>
+                    <label>Start Time</label>
+                    <input type="time" id="assignStart" class="input-field" required>
+                  </div>
+                  <div>
+                    <label>End Time</label>
+                    <input type="time" id="assignEnd" class="input-field" required>
+                  </div>
                 </div>
                 <button type="submit" class="action-btn">Commit Operational Slot Allocation</button>
               </form>
             </div>
             <div class="dashboard-card">
-              <div class="card-title">Live Operational Tracking Feed (Sheet2)</div>
+              <div class="card-title">Live Operational Tracking Feed (Sheet2 Live)</div>
               <div class="table-container">
-                <table><thead><tr><th>Teacher</th><th>Interpreter</th><th>Location</th><th>Timeframe</th><th>Status</th></tr></thead>
-                <tbody id="adminLiveTrackingRows"><tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Awaiting active sync parameters...</td></tr></tbody></table>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Teacher/Ref</th>
+                      <th>Interpreter Email</th>
+                      <th>School Location</th>
+                      <th>Time Frame</th>
+                      <th>Live Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminLiveTrackingRows">
+                    <tr>
+                      <td colspan="5" style="text-align:center; color:var(--text-muted);">Awaiting active sync parameters from Sheet2...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>`;
+          </div>
+        `;
       }
 
       function executeAssignmentPost(e) {
@@ -463,51 +402,99 @@
           startTime: document.getElementById("assignStart").value,
           endTime: document.getElementById("assignEnd").value
         };
-        fetch(`${WEB_APP_URL}?action=saveAssignment&data=${encodeURIComponent(JSON.stringify(data))}`)
-          .then(function(res) { return res.json(); })
-          .then(function(res) {
+
+        google.script.run
+          .withSuccessHandler(function(res) {
             if(res.success) {
-              alert("Assignment verified and locked down in Sheet2. Duration: " + res.computedHours + " hours.");
+              alert("Assignment verified and structural metrics locked down inside Sheet2. Auto Calculated Duration: " + res.computedHours + " hours.");
               document.getElementById("assignmentForm").reset();
+            } else {
+              alert("System pipeline logic fault: " + res.error);
             }
           })
-          .catch(function(err) { alert("Post error: " + err.toString()); });
+          .saveAssignment(data);
       }
 
+      // =========================================================================
+      // CENTRAL OFFICE / FAMILY COORDINATOR SUITE VIEW
+      // =========================================================================
       function renderCoordinatorDashboard(container) {
         container.innerHTML = `
           <div class="dashboard-card" style="margin-bottom: 2rem; border-left: 4px solid #3b82f6;">
-            <div class="card-title" style="color:#3b82f6;">Engagement Coordinator Overview</div>
-            <p style="font-size:0.95rem; color:#cbd5e1;">Reviewing multi-facility tracking metrics to balance translator loads.</p>
+            <div class="card-title" style="color:#3b82f6;">Coordinator Allocation Operations Dashboard</div>
+            <p style="font-size:0.95rem; line-height:1.6; color:#cbd5e1;">Welcome to the Family & Community Engagement Coordinator strategic view. This portal reviews multi-facility linguistic volume tracking metrics to balance district communication demands across student translator assets.</p>
           </div>
           <div class="grid-layout">
             <div class="dashboard-card">
-              <div class="card-title">Language Matrix Volumes</div>
+              <div class="card-title">Language Engagement Volume Matrix</div>
               <div class="table-container">
                 <table>
-                  <thead><tr><th>Dialect Profile</th><th>Active Today</th><th>Trend State</th></tr></thead>
+                  <thead>
+                    <tr><th>Linguistic Dialect Profile</th><th>Active Allocations Today</th><th>Trend Allocation State</th></tr>
+                  </thead>
                   <tbody>
-                    <tr><td>Spanish (Español)</td><td>14 Sessions</td><td style="color:#4ade80;">High Demand</td></tr>
-                    <tr><td>Arabic (العربية)</td><td>4 Sessions</td><td style="color:#64748b;">Stable</td></tr>
+                    <tr><td>Spanish (Español)</td><td>14 Sessions Active</td><td style="color:#4ade80;">High Demand</td></tr>
+                    <tr><td>Arabic (العربية)</td><td>4 Sessions Active</td><td style="color:#64748b;">Stable</td></tr>
+                    <tr><td>Kurdish (Kurdî)</td><td>3 Sessions Active</td><td style="color:#64748b;">Stable</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
-          </div>`;
+            <div class="dashboard-card">
+              <div class="card-title">District Infrastructure Coverage Metric Summary</div>
+              <div style="margin-top:1rem; display:flex; flex-direction:column; gap:12px;">
+                <div><span style="color:var(--text-muted); font-size:0.85rem;">High School Footprint Fill Rate</span><div style="background:#0f172a; height:8px; border-radius:4px; margin-top:4px;"><div style="background:var(--hcps-gold); width:92%; height:100%; border-radius:4px;"></div></div></div>
+                <div><span style="color:var(--text-muted); font-size:0.85rem;">Middle School Footprint Fill Rate</span><div style="background:#0f172a; height:8px; border-radius:4px; margin-top:4px;"><div style="background:var(--hcps-gold); width:78%; height:100%; border-radius:4px;"></div></div></div>
+                <div><span style="color:var(--text-muted); font-size:0.85rem;">Elementary Facility Coverage Footprint</span><div style="background:#0f172a; height:8px; border-radius:4px; margin-top:4px;"><div style="background:#3b82f6; width:64%; height:100%; border-radius:4px;"></div></div></div>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
+      // =========================================================================
+      // SYSTEM OVERSEER TECH OPERATIONS VIEW PANELS
+      // =========================================================================
       function renderTechDashboard(container) {
         container.innerHTML = `
           <div class="grid-layout">
             <div class="dashboard-card">
-              <div class="card-title">Infrastructure Monitoring</div>
-              <div style="color:#4ade80; font-weight:600; margin-top:10px;">Core Engines Online / Connected (0.12ms)</div>
+              <div class="card-title">System Infrastructure Status Overview</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:1rem;">
+                <div style="background:#0f172a; padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+                  <div style="font-size:0.8rem; color:var(--text-muted);">Core API Endpoints</div>
+                  <div style="color:#4ade80; font-weight:600; margin-top:5px; font-size:1.1rem;">Online / Secure</div>
+                </div>
+                <div style="background:#0f172a; padding:1rem; border-radius:8px; border:1px solid var(--border-color);">
+                  <div style="font-size:0.8rem; color:var(--text-muted);">Google Script Engine Data Sync</div>
+                  <div style="color:#4ade80; font-weight:600; margin-top:5px; font-size:1.1rem;">Connected (0.12ms)</div>
+                </div>
+              </div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Master Infrastructure Troubleshooting Triggers</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:0.5rem;">
+                <button class="action-btn" style="background:#334155; color:white; font-size:0.85rem;" onclick="appendLog('Clear Cache payload command broadcasted.')">Flush Session Cache</button>
+                <button class="action-btn" style="background:#ef4444; color:white; font-size:0.85rem;" onclick="appendLog('CRITICAL EXCEPTION ROUTINE STIMULATED.')">Force Re-index Whitelist</button>
+              </div>
             </div>
           </div>
           <div class="dashboard-card" style="margin-top:1.5rem;">
-            <div class="card-title">Application Pipeline Trace Logs</div>
-            <div id="techLogBlock" class="diagnostic-log">[2026-06-26T21:12:01Z] System Core Initialization verified...</div>
-          </div>`;
+            <div class="card-title">Real-Time Application Pipeline Trace Logs</div>
+            <div id="techLogBlock" class="diagnostic-log">
+              [2026-06-26T21:12:01Z] System Core Initialization Context Verified.<br>
+              [2026-06-26T21:12:05Z] Whitelisted Data Pipeline linked successfully across dynamic spreadsheet hooks.<br>
+              [2026-06-26T21:12:44Z] Secure Session Authorization established token reference parameters...
+            </div>
+          </div>
+        `;
+      }
+
+      function appendLog(msg) {
+        var log = document.getElementById("techLogBlock");
+        var d = new Date().toISOString();
+        log.innerHTML += `<br>[${d}] ${msg}`;
+        log.scrollTop = log.scrollHeight;
       }
     </script>
   </body>
