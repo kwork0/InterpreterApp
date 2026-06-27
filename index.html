@@ -188,15 +188,23 @@
 
     <script>
         if (activeUser) {
-            document.getElementById('dashDynamicName').innerText = activeUser.name;
-            document.getElementById('sessionProfileName').innerText = activeUser.name;
-            document.getElementById('sessionProfileEmail').innerText = activeUser.email;
-            
-            // Populating Dropdown content and Avatar Initial
-            document.getElementById('dropMenuName').innerText = activeUser.name;
-            document.getElementById('dropMenuEmail').innerText = activeUser.email;
-            document.getElementById('userAvatarBtn').innerText = activeUser.name.charAt(0).toUpperCase();
-        }
+    document.getElementById('dashDynamicName').innerText = activeUser.name;
+    document.getElementById('sessionProfileName').innerText = activeUser.name;
+    document.getElementById('sessionProfileEmail').innerText = activeUser.email;
+    
+    // Display the dynamic role underneath their profile card
+    document.getElementById('sessionProfileName').insertAdjacentHTML('afterend', `<br><span style="color: #f39200; font-weight: bold;">Role: ${activeUser.role}</span>`);
+    
+    document.getElementById('dropMenuName').innerText = activeUser.name;
+    document.getElementById('dropMenuEmail').innerText = activeUser.email;
+    document.getElementById('userAvatarBtn').innerText = activeUser.name.charAt(0).toUpperCase();
+
+    // Custom Role Guardrails: Hide elements from non-admins if desired
+    if (activeUser.role !== "Admin" && activeUser.role !== "Coordinator") {
+        // Example: Hide administrative controls or change styling for regular interpreters
+        console.log("Standard Interpreter View Loaded.");
+    }
+}
 
         function toggleDropdown(e) {
             e.stopPropagation();
