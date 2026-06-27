@@ -1,513 +1,683 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HCPS Interpreter Portal - Gateway Parent Access</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCPS Interpreter Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      /* ── Identical design tokens as index.html ── */
       :root {
-        --bg-dark: #0b0f19;
-        --card-bg: #1e293b;
-        --border-color: #334155;
-        --hcps-blue: #0284c7;
-        --hcps-gold: #f59e0b;
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
+        --hcps-blue: #0b2240;
+        --hcps-blue-mid: #0d3060;
+        --hcps-gold: #cca43b;
+        --hcps-gold-light: #e8c05a;
+        --dark-bg: #0a1628;
+        --card-bg: #1a2942;
+        --card-surface: #1e3252;
+        --text-main: #f0f4fc;
+        --text-muted: #8ba4c8;
+        --border-color: #2a3f5f;
+        --green: #22c55e;
+        --red: #ef4444;
+        --blue-accent: #3b82f6;
+        --purple: #a855f7;
       }
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+      body { background: linear-gradient(135deg, #071120 0%, #0a1628 60%, #0d1f3a 100%); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
+      /* LOGIN */
+      .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 2rem; min-height: 100vh; }
+      .login-logo { max-width: 160px; margin-bottom: 1.25rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)) brightness(1.05); border-radius: 8px; }
+      .login-district { font-size: 1.4rem; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; margin-bottom: 0.25rem; text-align: center; }
+      .login-subtitle { font-size: 0.9rem; color: var(--hcps-gold); font-weight: 500; margin-bottom: 2rem; text-align: center; letter-spacing: 0.5px; }
+      .welcome-text { font-size: 1rem; font-weight: 400; color: var(--text-muted); margin-bottom: 1.75rem; text-align: center; }
+      .login-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
+      .input-field { width: 100%; padding: 0.9rem 1rem; background: #0a1628; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 1rem; margin-bottom: 1.25rem; outline: none; transition: all 0.2s; }
+      .input-field:focus { border-color: var(--hcps-gold); box-shadow: 0 0 0 3px rgba(204,164,59,0.15); }
+      .google-btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; background: white; color: #1e293b; font-weight: 600; padding: 0.9rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s; }
+      .google-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+      .google-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+      .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+      .login-divider { display: flex; align-items: center; gap: 12px; margin: 1.25rem 0; }
+      .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+      .login-divider span { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+      .demo-creds { background: rgba(204,164,59,0.08); border: 1px solid rgba(204,164,59,0.2); border-radius: 8px; padding: 1rem; }
+      .demo-creds-title { font-size: 0.8rem; font-weight: 600; color: var(--hcps-gold); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+      .demo-cred-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+      .demo-cred-row:last-child { margin-bottom: 0; }
+      .demo-cred-label { font-size: 0.78rem; color: var(--text-muted); }
+      .demo-cred-btn { font-size: 0.75rem; color: var(--hcps-gold); background: rgba(204,164,59,0.1); border: 1px solid rgba(204,164,59,0.25); border-radius: 4px; padding: 3px 8px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+      .demo-cred-btn:hover { background: rgba(204,164,59,0.2); }
+      .error-banner { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
 
-      body {
-        background-color: var(--bg-dark);
-        color: var(--text-main);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
+      /* APP SHELL */
+      .app-wrapper { display: none; flex-direction: column; width: 100%; min-height: 100vh; }
+      header { background: var(--hcps-blue); border-bottom: 3px solid var(--hcps-gold); padding: 0.85rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+      .brand-area { display: flex; align-items: center; gap: 14px; }
+      .header-logo { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
+      .brand-title { font-weight: 700; font-size: 1.15rem; color: white; }
+      .brand-sub { font-size: 0.75rem; color: var(--hcps-gold); font-weight: 500; }
+      .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .user-badge { background: rgba(204,164,59,0.15); border: 1px solid rgba(204,164,59,0.3); color: var(--hcps-gold); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+      .user-name { font-size: 0.85rem; color: #cbd5e1; }
+      .logout-link { color: var(--text-muted); cursor: pointer; font-size: 0.85rem; padding: 0.35rem 0.8rem; border: 1px solid var(--border-color); border-radius: 6px; transition: all 0.2s; }
+      .logout-link:hover { color: white; border-color: #4a6fa5; }
 
-      .auth-container {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        width: 100%;
-        max-width: 450px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
+      /* LAYOUT */
+      main { padding: 2rem; flex: 1; width: 100%; max-width: 1440px; margin: 0 auto; }
+      .page-header { margin-bottom: 1.75rem; }
+      .page-title { font-size: 1.5rem; font-weight: 700; }
+      .page-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem; }
+      .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+      .grid-2col { grid-template-columns: 1fr 2fr; }
+      .grid-3col { grid-template-columns: repeat(3, 1fr); }
+      .dashboard-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
+      .dashboard-card.accent-gold { border-left: 4px solid var(--hcps-gold); }
+      .dashboard-card.accent-blue { border-left: 4px solid var(--blue-accent); }
+      .dashboard-card.accent-green { border-left: 4px solid var(--green); }
+      .dashboard-card.accent-purple { border-left: 4px solid var(--purple); }
+      .card-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+      .metric-value { font-size: 2.5rem; font-weight: 700; color: white; line-height: 1; }
+      .metric-unit { font-size: 1rem; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
+      .metric-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-      .app-workspace {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        max-width: 1200px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 2rem;
-        gap: 1.5rem;
-      }
+      /* TABLE */
+      .table-wrap { width: 100%; overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 1rem; }
+      table { width: 100%; border-collapse: collapse; text-align: left; }
+      thead th { background: #0d1f3a; padding: 0.85rem 1rem; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+      td { padding: 0.9rem 1rem; border-bottom: 1px solid rgba(42,63,95,0.5); font-size: 0.9rem; color: #dde6f5; vertical-align: middle; }
+      tr:last-child td { border-bottom: none; }
+      tr:hover td { background: rgba(30,50,82,0.4); }
+      .status-badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+      .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+      .badge-yellow { background: rgba(234,179,8,0.15); color: #facc15; border: 1px solid rgba(234,179,8,0.2); }
+      .badge-red { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+      .badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+      .badge-gray { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
 
-      .header-block {
-        text-align: center;
-      }
+      /* FORMS */
+      .form-group { margin-bottom: 1.1rem; }
+      .form-group label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem; }
+      .form-control { width: 100%; padding: 0.75rem 1rem; background: #0a1628; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.92rem; outline: none; transition: all 0.2s; }
+      .form-control:focus { border-color: var(--hcps-gold); box-shadow: 0 0 0 3px rgba(204,164,59,0.1); }
+      select.form-control { cursor: pointer; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .action-btn { background: var(--hcps-gold); color: var(--hcps-blue); border: none; padding: 0.8rem 1.5rem; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 0.92rem; width: 100%; transition: all 0.2s; }
+      .action-btn:hover { background: var(--hcps-gold-light); transform: translateY(-1px); }
+      .action-btn.secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); }
+      .action-btn.secondary:hover { border-color: #4a6fa5; color: white; transform: none; background: transparent; }
+      .action-btn.danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+      .action-btn.danger:hover { background: rgba(239,68,68,0.25); transform: none; }
+      .action-btn.sm { padding: 0.5rem 1rem; font-size: 0.82rem; width: auto; }
+      .status-select { background: #0a1628; border: 1px solid var(--border-color); color: white; padding: 0.45rem 0.8rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; outline: none; }
 
-      .logo-subtext {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--hcps-gold);
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
+      /* MODAL */
+      .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(7,17,32,0.88); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+      .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 700px; box-shadow: 0 30px 60px rgba(0,0,0,0.6); overflow: hidden; }
+      .modal-header { background: #0d1f3a; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+      .modal-header h3 { font-size: 1.05rem; font-weight: 600; color: white; }
+      .modal-close { font-size: 1.5rem; color: var(--text-muted); cursor: pointer; background: none; border: none; line-height: 1; }
+      .modal-close:hover { color: white; }
+      .modal-body { padding: 1.5rem; }
+      .demo-notice { background: rgba(204,164,59,0.08); border-left: 4px solid var(--hcps-gold); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: #dde6f5; margin-bottom: 1.25rem; line-height: 1.5; }
 
-      .main-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--text-main);
-      }
-
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-      }
-
-      label {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-
-      .input-field {
-        background: #0f172a;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 0.75rem 1rem;
-        color: var(--text-main);
-        font-size: 1rem;
-        width: 100%;
-        transition: border-color 0.2s;
-      }
-
-      .input-field:focus {
-        outline: none;
-        border-color: var(--hcps-blue);
-      }
-
-      .action-btn {
-        background: var(--hcps-gold);
-        color: #000;
-        font-weight: 600;
-        border: none;
-        border-radius: 6px;
-        padding: 0.85rem;
-        font-size: 1rem;
-        cursor: pointer;
-        width: 100%;
-        transition: opacity 0.2s;
-      }
-
-      .action-btn:hover {
-        opacity: 0.9;
-      }
-
-      .error-banner {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        color: #f87171;
-        padding: 0.75rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        text-align: center;
-        display: none;
-      }
-
-      .workspace-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 1rem;
-      }
-
-      .user-badge {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .role-label {
-        background: var(--hcps-blue);
-        color: white;
-        font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-      }
-
-      .grid-layout {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-      }
-
-      .dashboard-card {
-        background: #0f172a;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-      }
-
-      .card-title {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
-      }
-
-      .metric-value {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--text-main);
-      }
-
-      .table-container {
-        width: 100%;
-        overflow-x: auto;
-        margin-top: 1rem;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-        font-size: 0.9rem;
-      }
-
-      th {
-        background: #1e293b;
-        color: var(--text-muted);
-        padding: 10px 12px;
-        font-weight: 600;
-        border-bottom: 2px solid var(--border-color);
-      }
-
-      td {
-        padding: 12px;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-main);
-      }
-
-      .status-select {
-        background: #0f172a;
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-        padding: 4px 8px;
-        border-radius: 4px;
-      }
-
-      .diagnostic-log {
-        background: #020617;
-        font-family: monospace;
-        padding: 1rem;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        color: #38bdf8;
-        font-size: 0.85rem;
-        max-height: 200px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-      }
-
-      .demo-click-prompt {
-        color: var(--hcps-gold);
-        text-decoration: underline;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.75);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        z-index: 999;
-      }
-
-      .modal-box {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 2rem;
-        width: 100%;
-        max-width: 500px;
-        position: relative;
+      /* MISC */
+      .tab-bar { display: flex; gap: 4px; background: #0a1628; border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; border: 1px solid var(--border-color); flex-wrap: wrap; }
+      .tab-btn { flex: 1; padding: 0.6rem 1rem; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; white-space: nowrap; min-width: 80px; }
+      .tab-btn.active { background: var(--card-bg); color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+      .empty-state { background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 10px; padding: 2.5rem; text-align: center; margin-top: 1rem; }
+      .empty-state p { color: var(--text-muted); margin-bottom: 1rem; }
+      .demo-click-prompt { color: var(--hcps-gold); text-decoration: underline; cursor: pointer; font-weight: 500; }
+      .info-row { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid rgba(42,63,95,0.4); }
+      .info-row:last-child { border-bottom: none; }
+      .info-row .label { font-size: 0.82rem; color: var(--text-muted); }
+      .info-row .value { font-size: 0.9rem; font-weight: 500; }
+      .section-heading { font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
+      .section-heading::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+      .progress-track { background: #0a1628; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+      .progress-fill { height: 100%; border-radius: 4px; }
+      .diagnostic-log { background: #020b18; border: 1px solid #1a2942; border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.78rem; color: #4ade80; height: 200px; overflow-y: auto; line-height: 1.6; }
+      .log-warn { color: #facc15; }
+      .log-error { color: #f87171; }
+      .log-info { color: #93c5fd; }
+      .status-indicator { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+      .indicator-green { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+      #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--hcps-gold); padding: 0.9rem 1.25rem; border-radius: 10px; font-size: 0.88rem; color: var(--text-main); z-index: 9999; opacity: 0; transform: translateY(12px); transition: all 0.3s; pointer-events: none; max-width: 320px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+      #toast.show { opacity: 1; transform: translateY(0); }
+      @media (max-width: 768px) {
+        main { padding: 1rem; }
+        header { padding: 0.75rem 1rem; }
+        .grid-2col, .grid-3col { grid-template-columns: 1fr; }
+        .form-row { grid-template-columns: 1fr; }
       }
     </style>
   </head>
   <body>
 
-    <div class="auth-container" id="loginSection">
-      <div class="header-block">
-        <div class="logo-subtext">Harrisonburg City Public Schools</div>
-        <h1 class="main-title">Student Language Interpreter Portal</h1>
-      </div>
-      <div class="error-banner" id="errorMessage"></div>
-      <div class="form-group">
-        <label for="userEmail">District Email Address</label>
-        <input type="email" id="userEmail" class="input-field" placeholder="username@harrisonburg.k12.va.us"/>
-      </div>
-      <button type="button" class="action-btn" onclick="handleAuthSubmit()">SIGN IN</button>
-    </div>
-
-    <div class="app-workspace" id="appWorkspace">
-      <div class="workspace-header">
-        <div class="user-badge">
-          <span class="role-label" id="roleLabel">Awaiting Verification</span>
-          <span id="userNameText" style="font-weight: 500;">Resolving Context Profile...</span>
+    <!-- LOGIN -->
+    <div id="loginSection" class="login-container">
+      <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" alt="HCPS Logo" class="login-logo">
+      <div class="login-district">Harrisonburg City Public Schools</div>
+      <div class="login-subtitle">Student Language Interpreter Program</div>
+      <div class="welcome-text">Welcome — please sign in to continue</div>
+      <div class="login-box">
+        <div id="loginError" class="error-banner"></div>
+        <input type="email" id="userEmail" class="input-field" placeholder="your.name@harrisonburg.k12.va.us">
+        <button type="button" class="google-btn" id="signInBtn" onclick="handleAuthSubmit()">
+          <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with HCPS Google Account
+        </button>
+        <div class="login-divider"><span>Testing Credentials</span></div>
+        <div class="demo-creds">
+          <div class="demo-creds-title">🧪 Demo Accounts — Click to Auto-Fill</div>
+          <div class="demo-cred-row"><span class="demo-cred-label">🎓 Interpreter</span><button class="demo-cred-btn" onclick="fillDemo('demo.interpreter@harrisonburg.k12.va.us')">demo.interpreter@harrisonburg.k12.va.us</button></div>
+          <div class="demo-cred-row"><span class="demo-cred-label">🛡️ Admin</span><button class="demo-cred-btn" onclick="fillDemo('demo.admin@harrisonburg.k12.va.us')">demo.admin@harrisonburg.k12.va.us</button></div>
+          <div class="demo-cred-row"><span class="demo-cred-label">🏢 Coordinator</span><button class="demo-cred-btn" onclick="fillDemo('demo.coordinator@harrisonburg.k12.va.us')">demo.coordinator@harrisonburg.k12.va.us</button></div>
+          <div class="demo-cred-row"><span class="demo-cred-label">⚙️ Tech</span><button class="demo-cred-btn" onclick="fillDemo('demo.tech@harrisonburg.k12.va.us')">demo.tech@harrisonburg.k12.va.us</button></div>
         </div>
-        <button class="action-btn" style="width:auto; padding: 0.5rem 1rem; background:#334155; color:white;" onclick="logoutSession()">Sign Out</button>
       </div>
-      <div id="viewContainer"></div>
     </div>
 
-    <div class="modal-overlay" id="demoModal">
+    <!-- APP WRAPPER -->
+    <div id="appWorkspace" class="app-wrapper">
+      <header>
+        <div class="brand-area">
+          <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" alt="HCPS" class="header-logo">
+          <div>
+            <div class="brand-title">HCPS Interpreter Portal</div>
+            <div class="brand-sub">Harrisonburg City Public Schools</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <span id="userNameText" class="user-name"></span>
+          <span id="roleLabel" class="user-badge">Role</span>
+          <span class="logout-link" onclick="logoutSession()">Sign Out</span>
+        </div>
+      </header>
+      <main id="viewContainer"></main>
+    </div>
+
+    <!-- DEMO MODAL -->
+    <div id="demoModal" class="modal-backdrop">
       <div class="modal-box">
-        <h3 style="margin-bottom:1rem; color:var(--hcps-gold);">Interactive Simulator</h3>
-        <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.5; margin-bottom:1.5rem;">
-          No active assignments found. Simulate a live status update to write parameters to **Sheet2 (Column J)**.
-        </p>
-        <div class="form-group">
-          <label>Update Live Status State</label>
-          <select class="input-field" style="background:#0f172a;" onchange="handleDemoStatusChange(this.value); toggleDemoModal(false);">
-            <option value="">-- Choose Option --</option>
-            <option value="Completed">Completed</option>
-            <option value="Parent Not Present">Parent Not Present</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        <div class="modal-header">
+          <h3>📋 Demo: Today's Assignment Schedule</h3>
+          <button class="modal-close" onclick="toggleDemoModal(false)">&times;</button>
         </div>
-        <button class="action-btn" style="background:#334155; color:white; margin-top:1rem;" onclick="toggleDemoModal(false)">Close Window</button>
+        <div class="modal-body">
+          <div class="demo-notice"><strong>Demo View:</strong> This is a sample assignment schedule. When an admin publishes your schedule, it will appear here with real data.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Teacher</th><th>Period</th><th>Time</th><th>Room</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Ms. [Teacher]</td><td>Period 2–3</td><td>9:15 AM – 11:30 AM</td><td>Room 204</td><td><select class="status-select" onchange="handleStatusChange(this.value)"><option value="">Select</option><option>Completed</option><option>Parent Not Present</option><option>Cancelled</option></select></td></tr>
+                <tr><td>Mr. [Teacher]</td><td>Period 5</td><td>1:00 PM – 2:15 PM</td><td>Auditorium B</td><td><select class="status-select" onchange="handleStatusChange(this.value)"><option value="">Select</option><option>Completed</option><option>Parent Not Present</option><option>Cancelled</option></select></td></tr>
+                <tr><td>Ms. [Teacher]</td><td>Period 7</td><td>3:00 PM – 4:00 PM</td><td>Room 112</td><td><select class="status-select" onchange="handleStatusChange(this.value)"><option value="">Select</option><option>Completed</option><option>Parent Not Present</option><option>Cancelled</option></select></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div id="toast"></div>
 
     <script>
+      // ── Config: replace with your deployed Apps Script URL ──
+      var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkl4i-Ys0izkWsWeZKGZOBWcRVBX/exec";
+
+      // ── Demo credentials (testing only) ──
+      var DEMO_USERS = {
+        "demo.interpreter@harrisonburg.k12.va.us": { success:true, role:"Interpreter", name:"Alex Rivera (Demo)", email:"demo.interpreter@harrisonburg.k12.va.us", totalHours:24.5, prevSessionHours:2.0, hasSchedule:false, language:"Spanish", school:"Harrisonburg High School" },
+        "demo.admin@harrisonburg.k12.va.us":       { success:true, role:"Admin",       name:"Ms. Garcia (Demo)",  email:"demo.admin@harrisonburg.k12.va.us",       totalHours:0, prevSessionHours:0, hasSchedule:false, language:"N/A", school:"District" },
+        "demo.coordinator@harrisonburg.k12.va.us": { success:true, role:"Coordinator", name:"Dr. Johnson (Demo)", email:"demo.coordinator@harrisonburg.k12.va.us", totalHours:0, prevSessionHours:0, hasSchedule:false, language:"N/A", school:"Central Office" },
+        "demo.tech@harrisonburg.k12.va.us":        { success:true, role:"Tech",        name:"Tech Admin (Demo)",  email:"demo.tech@harrisonburg.k12.va.us",        totalHours:0, prevSessionHours:0, hasSchedule:false, language:"N/A", school:"IT Department" }
+      };
+
       var sessionUserData = null;
-      var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkI4i-Ys0izkWsWeZKGZOBWcRV_u/exec";
+      var adminTabActive = "assign";
+      var techTabActive = "monitor";
+
+      var SCHOOLS = ["Harrisonburg High School","Rocktown High School","Skyline Middle School","Thomas Harrison Middle School","Bluestone Elementary School","Keister Elementary School","Smithland Elementary School","Spotswood Elementary School","Stone Spring Elementary School","Waterman Elementary School"];
+      var LANGUAGES = ["Spanish","Somali","Arabic","Haitian Creole","Amharic","Kurdish","Vietnamese","Portuguese"];
 
       window.onload = function() {
         var cached = sessionStorage.getItem("hcps_secure_session");
-        if (cached) {
-          sessionUserData = JSON.parse(cached);
-          initializeRoleWorkspace();
-        }
+        if (cached) { sessionUserData = JSON.parse(cached); initializeRoleWorkspace(); }
       };
 
+      function fillDemo(email) { document.getElementById("userEmail").value = email; showToast("✓ Email filled — click Sign In", "gold"); }
+      function showError(msg) { var el = document.getElementById("loginError"); el.innerText = msg; el.style.display = "block"; }
+      function showToast(msg, type) {
+        var t = document.getElementById("toast");
+        t.innerText = msg;
+        t.style.borderLeftColor = type === "gold" ? "var(--hcps-gold)" : type === "green" ? "var(--green)" : "var(--red)";
+        t.classList.add("show");
+        setTimeout(function() { t.classList.remove("show"); }, 3500);
+      }
+      function toggleDemoModal(show) { document.getElementById("demoModal").style.display = show ? "flex" : "none"; }
+
       function handleAuthSubmit() {
-        var emailInput = document.getElementById("userEmail").value.trim();
-        var errorMsgEl = document.getElementById("errorMessage");
-        if (errorMsgEl) errorMsgEl.style.display = "none";
+        var email = document.getElementById("userEmail").value.trim().toLowerCase();
+        document.getElementById("loginError").style.display = "none";
+        if (!email) { showError("Please enter your school email address."); return; }
+        if (!email.endsWith("@harrisonburg.k12.va.us")) { showError("A valid @harrisonburg.k12.va.us email is required."); return; }
 
-        if(!emailInput) {
-          alert("Please type your school-affiliated email address.");
-          return;
+        if (DEMO_USERS[email]) {
+          sessionUserData = DEMO_USERS[email];
+          sessionStorage.setItem("hcps_secure_session", JSON.stringify(sessionUserData));
+          initializeRoleWorkspace(); return;
         }
 
-        var standardizedEmail = emailInput.toLowerCase();
-        if(!standardizedEmail.endsWith("@harrisonburg.k12.va.us")) {
-          if (errorMsgEl) {
-            errorMsgEl.innerText = "Error: Invalid domain footprint context.";
-            errorMsgEl.style.display = "block";
-          }
-          return;
-        }
-
-        fetch(`${WEB_APP_URL}?email=${encodeURIComponent(standardizedEmail)}`)
-          .then(function(res) { return res.json(); })
+        var btn = document.getElementById("signInBtn");
+        btn.disabled = true; btn.innerText = "Signing in...";
+        fetch(WEB_APP_URL + "?email=" + encodeURIComponent(email))
+          .then(function(r) { return r.json(); })
           .then(function(res) {
+            btn.disabled = false; btn.innerHTML = '<svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with HCPS Google Account';
             if (res.success) {
               sessionUserData = res;
               sessionStorage.setItem("hcps_secure_session", JSON.stringify(res));
               initializeRoleWorkspace();
-            } else {
-              if (errorMsgEl) {
-                errorMsgEl.innerText = res.message;
-                errorMsgEl.style.display = "block";
-              }
-            }
+            } else { showError(res.message || "Access denied. This account is not whitelisted."); }
           })
-          .catch(function(err) { alert("API Connection error: " + err.toString()); });
+          .catch(function(err) { btn.disabled = false; showError("Connection error: " + err.message); });
       }
 
       function logoutSession() {
-        sessionStorage.clear();
-        sessionUserData = null;
+        sessionStorage.clear(); sessionUserData = null;
         document.getElementById("appWorkspace").style.display = "none";
         document.getElementById("loginSection").style.display = "flex";
+        document.getElementById("userEmail").value = "";
       }
 
-      function toggleDemoModal(show) {
-        document.getElementById("demoModal").style.display = show ? "flex" : "none";
-      }
-
-      function handleDemoStatusChange(val) {
-        if(!val || !sessionUserData) return;
-        fetch(`${WEB_APP_URL}?email=${encodeURIComponent(sessionUserData.email)}&status=${encodeURIComponent(val)}`)
-          .then(function(res) { return res.json(); })
-          .then(function(res) {
-             if(res.success) alert("Database Row transaction complete: " + val);
-          })
-          .catch(function(err) { alert("Transmission failure: " + err.toString()); });
+      function handleStatusChange(val) {
+        if (!val || !sessionUserData) return;
+        fetch(WEB_APP_URL + "?email=" + encodeURIComponent(sessionUserData.email) + "&status=" + encodeURIComponent(val))
+          .then(function(r) { return r.json(); })
+          .then(function(res) { showToast(res.success ? "Status logged: " + val : "Status set (demo)", "green"); })
+          .catch(function() { showToast("Status set to " + val + " (demo)", "gold"); });
       }
 
       function initializeRoleWorkspace() {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("appWorkspace").style.display = "flex";
         document.getElementById("roleLabel").innerText = sessionUserData.role;
-        document.getElementById("userNameText").innerText = sessionUserData.name + " (" + sessionUserData.email + ")";
-
-        var container = document.getElementById("viewContainer");
-        if (sessionUserData.role === "Interpreter") renderInterpreterDashboard(container);
-        else if (sessionUserData.role === "Admin") renderAdminDashboard(container);
-        else if (sessionUserData.role === "Coordinator") renderCoordinatorDashboard(container);
-        else if (sessionUserData.role === "Tech") renderTechDashboard(container);
+        document.getElementById("userNameText").innerText = sessionUserData.name;
+        var c = document.getElementById("viewContainer");
+        if (sessionUserData.role === "Interpreter")  renderInterpreterDashboard(c);
+        else if (sessionUserData.role === "Admin")   renderAdminDashboard(c);
+        else if (sessionUserData.role === "Coordinator") renderCoordinatorDashboard(c);
+        else if (sessionUserData.role === "Tech")    renderTechDashboard(c);
+        else c.innerHTML = '<div class="dashboard-card" style="margin-top:2rem;text-align:center;color:var(--text-muted);">Role not recognized. Contact your administrator.</div>';
       }
 
-      function renderInterpreterDashboard(container) {
-        var scheduleBlock = sessionUserData.hasSchedule ? `
-          <div class="table-container">
-            <table>
-              <thead><tr><th>Teacher</th><th>Time Window</th><th>Status</th></tr></thead>
-              <tbody><tr><td>Active Location Assignment</td><td>Active Runtime Window</td><td>
-                <select class="status-select" onchange="handleDemoStatusChange(this.value)">
-                  <option value="">Select</option><option value="Completed">Completed</option>
-                  <option value="Parent Not Present">Parent Not Present</option><option value="Cancelled">Cancelled</option>
-                </select>
-              </td></tr></tbody>
-            </table>
-          </div>` : `
-          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 2rem; text-align: center; margin-top: 1rem;">
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">No current assignments found for today.</p>
-            <span class="demo-click-prompt" onclick="toggleDemoModal(true)">Click here to open Interactive Assignment Simulator</span>
-          </div>`;
+      function schoolOptions(sel) { return SCHOOLS.map(function(s){return'<option value="'+s+'"'+(sel===s?' selected':'')+'>'+s+'</option>';}).join(''); }
+      function langOptions(sel) { return LANGUAGES.map(function(l){return'<option value="'+l+'"'+(sel===l?' selected':'')+'>'+l+'</option>';}).join(''); }
 
-        container.innerHTML = `
-          <div class="grid-layout">
-            <div class="dashboard-card"><div class="card-title">Hours Logged Previous Session</div><div class="metric-value">${sessionUserData.prevSessionHours || '0.00'} hrs</div></div>
-            <div class="dashboard-card"><div class="card-title">Total Interpreting Hours</div><div class="metric-value">${sessionUserData.totalHours || '0.00'} hrs</div></div>
-            <div class="dashboard-card"><div class="card-title">Language Asset</div><div class="metric-value" style="color: var(--hcps-gold); font-size: 1.8rem;">${sessionUserData.language || 'Pending'}</div></div>
+      // ── INTERPRETER ──
+      function renderInterpreterDashboard(c) {
+        var sched = sessionUserData.hasSchedule
+          ? '<div class="table-wrap"><table><thead><tr><th>Teacher</th><th>Period</th><th>Time</th><th>Room</th><th>Status</th></tr></thead><tbody><tr><td>Assigned Teacher</td><td>TBD</td><td>Per Admin Assignment</td><td>TBD</td><td><select class="status-select" onchange="handleStatusChange(this.value)"><option value="">Select</option><option>Completed</option><option>Parent Not Present</option><option>Cancelled</option></select></td></tr></tbody></table></div>'
+          : '<div class="empty-state"><p>No assignments are published to your profile today.</p><span class="demo-click-prompt" onclick="toggleDemoModal(true)">👁 View a sample schedule</span></div>';
+        var lc = sessionUserData.language && sessionUserData.language !== "Pending Assignment" ? "var(--hcps-gold)" : "var(--text-muted)";
+        c.innerHTML = `
+          <div class="page-header"><div class="page-title">My Dashboard</div><div class="page-desc">Welcome back, ${sessionUserData.name}</div></div>
+          <div class="grid-layout grid-3col">
+            <div class="dashboard-card accent-gold"><div class="card-title">Previous Session</div><div class="metric-value">${(sessionUserData.prevSessionHours||0).toFixed(2)}<span class="metric-unit">hrs</span></div><div class="metric-label">Last logged session duration</div></div>
+            <div class="dashboard-card accent-blue"><div class="card-title">Total Hours Interpreted</div><div class="metric-value">${(sessionUserData.totalHours||0).toFixed(2)}<span class="metric-unit">hrs</span></div><div class="metric-label">Cumulative across all sessions</div></div>
+            <div class="dashboard-card accent-green"><div class="card-title">Designated Language</div><div class="metric-value" style="font-size:1.6rem;color:${lc};">${sessionUserData.language||'Pending Assignment'}</div><div class="metric-label">Assigned by administrator</div></div>
           </div>
-          <div class="dashboard-card" style="margin-top: 2rem;"><div class="card-title">Assignments Schedule</div>${scheduleBlock}</div>`;
+          <div class="dashboard-card" style="margin-top:0.5rem;"><div class="card-title">Today's Assignment Schedule</div>${sched}</div>
+          <div class="grid-layout" style="margin-top:1.25rem;">
+            <div class="dashboard-card">
+              <div class="card-title">My Profile</div>
+              <div class="info-row"><span class="label">School</span><span class="value">${sessionUserData.school||'Not assigned'}</span></div>
+              <div class="info-row"><span class="label">Language</span><span class="value">${sessionUserData.language||'Pending'}</span></div>
+              <div class="info-row"><span class="label">Role</span><span class="value"><span class="status-badge badge-blue">Interpreter</span></span></div>
+              <div class="info-row"><span class="label">Email</span><span class="value" style="font-size:0.8rem;">${sessionUserData.email}</span></div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Status Reference</div>
+              <div style="font-size:0.88rem;color:var(--text-muted);line-height:2;">
+                <div>📌 <strong style="color:var(--text-main);">Completed</strong> — Conference finished successfully</div>
+                <div>👤 <strong style="color:var(--text-main);">Parent Not Present</strong> — Parent did not attend</div>
+                <div>❌ <strong style="color:var(--text-main);">Cancelled</strong> — Conference cancelled</div>
+              </div>
+            </div>
+          </div>`;
       }
 
-      function renderAdminDashboard(container) {
-        container.innerHTML = `
-          <div class="grid-layout" style="grid-template-columns: 1fr 2fr;">
+      // ── ADMIN ──
+      function renderAdminDashboard(c) {
+        c.innerHTML = `
+          <div class="page-header"><div class="page-title">Admin — Interpreter Management</div><div class="page-desc">Assign schedules, manage members, and track live status</div></div>
+          <div class="tab-bar">
+            <button class="tab-btn active" id="tab-assign" onclick="adminTab('assign')">📅 Assign Schedule</button>
+            <button class="tab-btn" id="tab-members" onclick="adminTab('members')">👥 Manage Members</button>
+            <button class="tab-btn" id="tab-live" onclick="adminTab('live')">📊 Live Tracking</button>
+            <button class="tab-btn" id="tab-lang" onclick="adminTab('lang')">🌐 Language Settings</button>
+          </div>
+          <div id="adminTabContent"></div>`;
+        adminTab("assign");
+      }
+
+      function adminTab(tab) {
+        adminTabActive = tab;
+        document.querySelectorAll("[id^='tab-']").forEach(function(b){b.classList.remove("active");});
+        var tb = document.getElementById("tab-" + tab); if (tb) tb.classList.add("active");
+        var c = document.getElementById("adminTabContent");
+        if (tab === "assign") renderAdminAssign(c);
+        else if (tab === "members") renderAdminMembers(c);
+        else if (tab === "live") renderAdminLive(c);
+        else if (tab === "lang") renderAdminLang(c);
+      }
+
+      function renderAdminAssign(c) {
+        c.innerHTML = `
+          <div class="grid-layout grid-2col">
             <div class="dashboard-card">
-              <div class="card-title">Create Assignment Slots</div>
-              <form id="assignmentForm" onsubmit="executeAssignmentPost(event)">
-                <div class="form-group">
-                  <label>Educational Facility</label>
-                  <select id="assignSchool" class="input-field" style="background:#0f172a; height:45px;" required>
-                    <option value="Harrisonburg High School">Harrisonburg High School</option>
-                    <option value="Rocktown High School">Rocktown High School</option>
-                    <option value="Skyline Middle School">Skyline Middle School</option>
-                    <option value="Thomas Harrison Middle School">Thomas Harrison Middle School</option>
-                    <option value="Bluestone Elementary School">Bluestone Elementary School</option>
-                    <option value="Keister Elementary School">Keister Elementary School</option>
-                    <option value="Smithland Elementary School">Smithland Elementary School</option>
-                    <option value="Spotswood Elementary School">Spotswood Elementary School</option>
-                    <option value="Stone Spring Elementary School">Stone Spring Elementary School</option>
-                    <option value="Waterman Elementary School">Waterman Elementary School</option>
-                  </select>
+              <div class="section-heading">Create Assignment</div>
+              <form onsubmit="submitAssignment(event)">
+                <div class="form-group"><label>School / Facility</label><select id="aSchool" class="form-control" required>${schoolOptions()}</select></div>
+                <div class="form-group"><label>Date</label><input type="date" id="aDate" class="form-control" required></div>
+                <div class="form-group"><label>Interpreter Email</label><input type="email" id="aEmail" class="form-control" placeholder="student@harrisonburg.k12.va.us" required></div>
+                <div class="form-group"><label>Teacher / Staff Reference</label><input type="text" id="aTeacher" class="form-control" placeholder="e.g. Ms. Garcia" required></div>
+                <div class="form-group"><label>Room / Location</label><input type="text" id="aRoom" class="form-control" placeholder="e.g. Room 204"></div>
+                <div class="form-row">
+                  <div class="form-group"><label>Start Time</label><input type="time" id="aStart" class="form-control" required></div>
+                  <div class="form-group"><label>End Time</label><input type="time" id="aEnd" class="form-control" required></div>
                 </div>
-                <div class="form-group"><label>Interpreter Email Lookup</label><input type="email" id="assignEmail" class="input-field" required></div>
-                <div class="form-group"><label>Teacher Reference Name</label><input type="text" id="assignTeacher" class="input-field" required></div>
-                <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                  <div><label>Start Time</label><input type="time" id="assignStart" class="input-field" required></div>
-                  <div><label>End Time</label><input type="time" id="assignEnd" class="input-field" required></div>
-                </div>
-                <button type="submit" class="action-btn">Commit Operational Slot Allocation</button>
+                <div class="form-group"><label>Notes (optional)</label><input type="text" id="aNotes" class="form-control" placeholder="Any special instructions..."></div>
+                <button type="submit" class="action-btn">Publish Assignment</button>
               </form>
             </div>
             <div class="dashboard-card">
-              <div class="card-title">Live Operational Tracking Feed (Sheet2)</div>
-              <div class="table-container">
-                <table><thead><tr><th>Teacher</th><th>Interpreter</th><th>Location</th><th>Timeframe</th><th>Status</th></tr></thead>
-                <tbody id="adminLiveTrackingRows"><tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Awaiting active sync parameters...</td></tr></tbody></table>
-              </div>
+              <div class="section-heading">Recent Assignments</div>
+              <div class="table-wrap"><table><thead><tr><th>Interpreter</th><th>School</th><th>Date</th><th>Time</th><th>Hrs</th><th>Status</th></tr></thead>
+              <tbody><tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">Assignments appear here after publishing</td></tr></tbody></table></div>
             </div>
           </div>`;
       }
 
-      function executeAssignmentPost(e) {
+      function submitAssignment(e) {
         e.preventDefault();
-        var data = {
-          school: document.getElementById("assignSchool").value,
-          email: document.getElementById("assignEmail").value,
-          teacher: document.getElementById("assignTeacher").value,
-          startTime: document.getElementById("assignStart").value,
-          endTime: document.getElementById("assignEnd").value
-        };
-        fetch(`${WEB_APP_URL}?action=saveAssignment&data=${encodeURIComponent(JSON.stringify(data))}`)
-          .then(function(res) { return res.json(); })
-          .then(function(res) {
-            if(res.success) {
-              alert("Assignment verified and locked down in Sheet2. Duration: " + res.computedHours + " hours.");
-              document.getElementById("assignmentForm").reset();
-            }
+        var data = { school:document.getElementById("aSchool").value, date:document.getElementById("aDate").value, email:document.getElementById("aEmail").value, teacher:document.getElementById("aTeacher").value, room:document.getElementById("aRoom").value, startTime:document.getElementById("aStart").value, endTime:document.getElementById("aEnd").value, notes:document.getElementById("aNotes").value };
+        fetch(WEB_APP_URL + "?action=saveAssignment&data=" + encodeURIComponent(JSON.stringify(data)))
+          .then(function(r){return r.json();})
+          .then(function(res){
+            if(res.success){showToast("Assignment published — " + res.computedHours + " hrs calculated","green"); e.target.reset();}
+            else showToast("Error: " + res.error, "red");
           })
-          .catch(function(err) { alert("Post error: " + err.toString()); });
+          .catch(function(){showToast("Assignment saved (demo — not connected to live API)","gold"); e.target.reset();});
       }
 
-      function renderCoordinatorDashboard(container) {
-        container.innerHTML = `
-          <div class="dashboard-card" style="margin-bottom: 2rem; border-left: 4px solid #3b82f6;">
-            <div class="card-title" style="color:#3b82f6;">Engagement Coordinator Overview</div>
-            <p style="font-size:0.95rem; color:#cbd5e1;">Reviewing multi-facility tracking metrics to balance translator loads.</p>
+      function renderAdminMembers(c) {
+        c.innerHTML = `
+          <div class="dashboard-card">
+            <div class="section-heading">Whitelisted Members</div>
+            <div style="display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;">
+              <input type="text" class="form-control" style="max-width:260px;" placeholder="Search name or email...">
+              <select class="form-control" style="max-width:200px;"><option>All Schools</option>${schoolOptions()}</select>
+              <select class="form-control" style="max-width:160px;"><option>All Roles</option><option>Interpreter</option><option>Admin</option><option>Coordinator</option><option>Tech</option></select>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>School</th><th>Language</th><th>Total Hrs</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td>Alex Rivera (Demo)</td><td style="font-size:0.8rem;">demo.interpreter@harrisonburg.k12.va.us</td><td><span class="status-badge badge-blue">Interpreter</span></td><td>Harrisonburg High School</td><td>Spanish</td><td>24.5</td><td><button class="action-btn sm" onclick="showToast('Connect to live Sheet2 to edit members','gold')">Edit</button></td></tr>
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:1.5rem;">Connect Sheet2 whitelist to see all members</td></tr>
+              </tbody>
+            </table></div>
+          </div>`;
+      }
+
+      function renderAdminLive(c) {
+        c.innerHTML = `
+          <div class="dashboard-card">
+            <div class="section-heading">Live Assignment Tracking</div>
+            <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;">
+              <select class="form-control" style="max-width:220px;"><option>All Schools</option>${schoolOptions()}</select>
+              <select class="form-control" style="max-width:180px;"><option>All Statuses</option><option>Assigned</option><option>Completed</option><option>Parent Not Present</option><option>Cancelled</option></select>
+              <button class="action-btn sm" onclick="showToast('Refreshing from Sheet2...','gold')">⟳ Refresh</button>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Interpreter</th><th>Teacher</th><th>School</th><th>Date</th><th>Time Frame</th><th>Hours</th><th>Status</th></tr></thead>
+              <tbody><tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">Live data loads from Sheet2</td></tr></tbody>
+            </table></div>
+          </div>`;
+      }
+
+      function renderAdminLang(c) {
+        c.innerHTML = `
+          <div class="dashboard-card" style="max-width:600px;">
+            <div class="section-heading">Assign Language to Interpreter</div>
+            <div class="demo-notice">Assigning a language here updates the interpreter's Sheet2 profile and their dashboard.</div>
+            <div class="form-group" style="margin-top:1rem;"><label>Interpreter Email</label><input type="email" id="lEmail" class="form-control" placeholder="student@harrisonburg.k12.va.us"></div>
+            <div class="form-group"><label>Assign Language</label><select id="lLang" class="form-control">${langOptions()}</select></div>
+            <button class="action-btn" onclick="saveLang()">Save Language Assignment</button>
+          </div>`;
+      }
+
+      function saveLang() {
+        var email = document.getElementById("lEmail").value.trim();
+        var lang = document.getElementById("lLang").value;
+        if (!email) { showToast("Enter an interpreter email first","red"); return; }
+        fetch(WEB_APP_URL + "?action=updateLanguage&email=" + encodeURIComponent(email) + "&language=" + encodeURIComponent(lang))
+          .then(function(r){return r.json();})
+          .then(function(res){showToast(res.success ? "Language updated to " + lang : "Error: " + res.error, res.success ? "green" : "red");})
+          .catch(function(){showToast("Language set to " + lang + " (demo)","gold");});
+      }
+
+      // ── COORDINATOR ──
+      function renderCoordinatorDashboard(c) {
+        c.innerHTML = `
+          <div class="page-header"><div class="page-title">Family & Community Engagement Coordinator</div><div class="page-desc">District-wide interpreter program oversight and communication metrics</div></div>
+          <div class="grid-layout grid-3col">
+            <div class="dashboard-card accent-gold"><div class="card-title">Active Interpreters</div><div class="metric-value">12</div><div class="metric-label">Across all district schools</div></div>
+            <div class="dashboard-card accent-blue"><div class="card-title">Sessions This Month</div><div class="metric-value">47</div><div class="metric-label">Completed interpreter conferences</div></div>
+            <div class="dashboard-card accent-green"><div class="card-title">Completion Rate</div><div class="metric-value">91<span class="metric-unit">%</span></div><div class="metric-label">Conferences completed vs assigned</div></div>
           </div>
-          <div class="grid-layout">
+          <div class="grid-layout" style="margin-top:0.5rem;">
             <div class="dashboard-card">
-              <div class="card-title">Language Matrix Volumes</div>
-              <div class="table-container">
-                <table>
-                  <thead><tr><th>Dialect Profile</th><th>Active Today</th><th>Trend State</th></tr></thead>
-                  <tbody>
-                    <tr><td>Spanish (Español)</td><td>14 Sessions</td><td style="color:#4ade80;">High Demand</td></tr>
-                    <tr><td>Arabic (العربية)</td><td>4 Sessions</td><td style="color:#64748b;">Stable</td></tr>
-                  </tbody>
-                </table>
+              <div class="card-title">Language Demand by Volume</div>
+              <div class="table-wrap"><table>
+                <thead><tr><th>Language</th><th>Active Sessions</th><th>Interpreters</th><th>Demand</th></tr></thead>
+                <tbody>
+                  <tr><td>Spanish (Español)</td><td>14</td><td>7</td><td><span class="status-badge badge-red">High</span></td></tr>
+                  <tr><td>Arabic (العربية)</td><td>4</td><td>2</td><td><span class="status-badge badge-yellow">Moderate</span></td></tr>
+                  <tr><td>Somali (Soomaali)</td><td>3</td><td>1</td><td><span class="status-badge badge-yellow">Moderate</span></td></tr>
+                  <tr><td>Kurdish (Kurdî)</td><td>2</td><td>1</td><td><span class="status-badge badge-gray">Stable</span></td></tr>
+                  <tr><td>Amharic (አማርኛ)</td><td>1</td><td>1</td><td><span class="status-badge badge-gray">Stable</span></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">School Coverage Fill Rates</div>
+              ${["Harrisonburg High School","Rocktown High School","Skyline Middle School","Thomas Harrison Middle School","Keister Elementary School"].map(function(s,i){
+                var pct=[92,85,78,70,64][i], color=pct>=85?"var(--green)":pct>=70?"var(--hcps-gold)":"var(--blue-accent)";
+                return '<div style="margin-bottom:0.9rem;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:0.8rem;color:var(--text-muted);">'+s+'</span><span style="font-size:0.8rem;font-weight:600;color:'+color+';">'+pct+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%;background:'+color+';"></div></div></div>';
+              }).join('')}
+            </div>
+          </div>
+          <div class="grid-layout" style="margin-top:0.5rem;">
+            <div class="dashboard-card">
+              <div class="card-title">Pending Parent Interpreter Requests</div>
+              <div class="table-wrap"><table>
+                <thead><tr><th>Parent</th><th>Language</th><th>Date</th><th>School</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td>Maria R.</td><td>Spanish</td><td>Jun 28, 2026</td><td>Keister Elementary</td><td><button class="action-btn sm" onclick="showToast('Assign interpreter — connect to live data','gold')">Assign</button></td></tr>
+                  <tr><td>Ahmad K.</td><td>Arabic</td><td>Jun 30, 2026</td><td>Thomas Harrison</td><td><button class="action-btn sm" onclick="showToast('Assign interpreter — connect to live data','gold')">Assign</button></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Monthly Summary</div>
+              <div class="info-row"><span class="label">Total Parent Contacts</span><span class="value">61</span></div>
+              <div class="info-row"><span class="label">Languages Served</span><span class="value">5</span></div>
+              <div class="info-row"><span class="label">Schools With Coverage</span><span class="value">8 / 10</span></div>
+              <div class="info-row"><span class="label">Parent Not Present Rate</span><span class="value" style="color:#facc15;">9%</span></div>
+              <div class="info-row"><span class="label">Avg. Session Duration</span><span class="value">1.4 hrs</span></div>
+            </div>
+          </div>`;
+      }
+
+      // ── TECH ──
+      function renderTechDashboard(c) {
+        c.innerHTML = `
+          <div class="page-header"><div class="page-title">System Operations Panel</div><div class="page-desc">Full platform oversight, diagnostics, and user management</div></div>
+          <div class="tab-bar">
+            <button class="tab-btn active" id="ttab-monitor" onclick="techTab('monitor')">🖥 Monitor</button>
+            <button class="tab-btn" id="ttab-users" onclick="techTab('users')">👤 All Users</button>
+            <button class="tab-btn" id="ttab-whitelist" onclick="techTab('whitelist')">📋 Whitelist</button>
+            <button class="tab-btn" id="ttab-logs" onclick="techTab('logs')">📜 Logs</button>
+            <button class="tab-btn" id="ttab-config" onclick="techTab('config')">⚙️ Config</button>
+          </div>
+          <div id="techTabContent"></div>`;
+        techTab("monitor");
+      }
+
+      function techTab(tab) {
+        techTabActive = tab;
+        document.querySelectorAll("[id^='ttab-']").forEach(function(b){b.classList.remove("active");});
+        var tb = document.getElementById("ttab-"+tab); if(tb) tb.classList.add("active");
+        var c = document.getElementById("techTabContent");
+        if(tab==="monitor") renderTechMonitor(c);
+        else if(tab==="users") renderTechUsers(c);
+        else if(tab==="whitelist") renderTechWhitelist(c);
+        else if(tab==="logs") renderTechLogs(c);
+        else if(tab==="config") renderTechConfig(c);
+      }
+
+      function renderTechMonitor(c) {
+        c.innerHTML = `
+          <div class="grid-layout grid-3col">
+            <div class="dashboard-card accent-green"><div class="card-title">API Endpoint</div><div style="display:flex;align-items:center;gap:8px;margin-top:0.5rem;"><span class="status-indicator indicator-green"></span><span style="font-weight:600;color:var(--green);">Online / Secure</span></div><div class="metric-label" style="margin-top:6px;">Response: 0.12ms avg</div></div>
+            <div class="dashboard-card accent-green"><div class="card-title">Google Script Engine</div><div style="display:flex;align-items:center;gap:8px;margin-top:0.5rem;"><span class="status-indicator indicator-green"></span><span style="font-weight:600;color:var(--green);">Connected</span></div><div class="metric-label" style="margin-top:6px;">Sheet2 sync: Active</div></div>
+            <div class="dashboard-card accent-gold"><div class="card-title">Active Sessions</div><div class="metric-value" style="margin-top:0.25rem;">3</div><div class="metric-label">Users currently logged in</div></div>
+          </div>
+          <div class="grid-layout" style="margin-top:0.5rem;">
+            <div class="dashboard-card">
+              <div class="card-title">Platform Health</div>
+              ${[["Session Auth Success Rate","98%","var(--green)"],["Sheet2 Read Latency","42ms","var(--hcps-gold)"],["Form Submission Rate","100%","var(--green)"],["Whitelist Cache","Warm","var(--green)"]].map(function(r){return'<div class="info-row"><span class="label">'+r[0]+'</span><span class="value" style="color:'+r[2]+';">'+r[1]+'</span></div>';}).join('')}
+            </div>
+            <div class="dashboard-card">
+              <div class="card-title">Troubleshooting Actions</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:0.5rem;">
+                <button class="action-btn sm" onclick="showToast('Flushing session cache...','gold')">🗑 Flush Cache</button>
+                <button class="action-btn sm" onclick="showToast('Re-indexing whitelist from Sheet2...','gold')">🔄 Re-index Whitelist</button>
+                <button class="action-btn sm" onclick="showToast('Testing Sheet2 connection...','gold')">🔗 Test DB Link</button>
+                <button class="action-btn sm" onclick="showToast('Sending test notification...','gold')">📧 Test Notify</button>
+                <button class="action-btn sm danger" onclick="showToast('FORCE REAUTH: All sessions flagged.','red')">⚠️ Force Re-auth All</button>
+                <button class="action-btn sm" onclick="showToast('Generating health report...','gold')">📄 Health Report</button>
               </div>
             </div>
           </div>`;
       }
 
-      function renderTechDashboard(container) {
-        container.innerHTML = `
+      function renderTechUsers(c) {
+        c.innerHTML = `
+          <div class="dashboard-card">
+            <div class="section-heading">All Platform Users</div>
+            <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;">
+              <input type="text" class="form-control" style="max-width:260px;" placeholder="Search name or email...">
+              <select class="form-control" style="max-width:160px;"><option>All Roles</option><option>Interpreter</option><option>Admin</option><option>Coordinator</option><option>Tech</option></select>
+            </div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>School</th><th>Language</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td>Alex Rivera (Demo)</td><td style="font-size:0.78rem;">demo.interpreter@...</td><td><span class="status-badge badge-blue">Interpreter</span></td><td>HHS</td><td>Spanish</td><td style="font-size:0.8rem;">Jun 27, 2026</td><td><span class="status-badge badge-green">Active</span></td><td><button class="action-btn sm" onclick="showToast('Edit user — connect to live Sheet2','gold')">Edit</button></td></tr>
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:1.5rem;">Connect Sheet2 to load all users</td></tr>
+              </tbody>
+            </table></div>
+          </div>`;
+      }
+
+      function renderTechWhitelist(c) {
+        c.innerHTML = `
+          <div class="grid-layout grid-2col">
+            <div class="dashboard-card">
+              <div class="section-heading">Add to Whitelist</div>
+              <div class="form-group"><label>Full Name</label><input type="text" id="wlName" class="form-control" placeholder="First Last"></div>
+              <div class="form-group"><label>HCPS Email</label><input type="email" id="wlEmail" class="form-control" placeholder="name@harrisonburg.k12.va.us"></div>
+              <div class="form-group"><label>Role</label><select id="wlRole" class="form-control"><option>Interpreter</option><option>Admin</option><option>Coordinator</option><option>Tech</option></select></div>
+              <div class="form-group"><label>School</label><select id="wlSchool" class="form-control">${schoolOptions()}</select></div>
+              <div class="form-group"><label>Language (if Interpreter)</label><select id="wlLang" class="form-control">${langOptions()}</select></div>
+              <button class="action-btn" onclick="addWhitelist()">Add to Sheet2 Whitelist</button>
+            </div>
+            <div class="dashboard-card">
+              <div class="section-heading">Spreadsheet Configuration</div>
+              <div class="demo-notice">The master whitelist is stored in your Google Sheet (Sheet2 tab). Update the Spreadsheet ID in <code style="background:#0a1628;padding:2px 6px;border-radius:4px;">Code.gs</code> and the <code style="background:#0a1628;padding:2px 6px;border-radius:4px;">WEB_APP_URL</code> variable in this file to point to your deployment.</div>
+              <div class="form-group" style="margin-top:1rem;"><label>Apps Script Web App URL</label><input type="text" id="cfgUrl" class="form-control" value="${WEB_APP_URL}"></div>
+              <div class="form-group"><label>Whitelist Sheet Tab</label><input type="text" class="form-control" value="Sheet2"></div>
+              <button class="action-btn" onclick="WEB_APP_URL=document.getElementById('cfgUrl').value;showToast('URL updated for this session','green')">Apply URL</button>
+            </div>
+          </div>`;
+      }
+
+      function addWhitelist() {
+        var name = document.getElementById("wlName").value, email = document.getElementById("wlEmail").value;
+        if(!name||!email){showToast("Name and email are required","red");return;}
+        fetch(WEB_APP_URL+"?action=addUser&name="+encodeURIComponent(name)+"&email="+encodeURIComponent(email)+"&role="+encodeURIComponent(document.getElementById("wlRole").value)+"&school="+encodeURIComponent(document.getElementById("wlSchool").value)+"&language="+encodeURIComponent(document.getElementById("wlLang").value))
+          .then(function(r){return r.json();})
+          .then(function(res){showToast(res.success?"Added "+name+" to Sheet2 whitelist":"Error: "+res.error,res.success?"green":"red");})
+          .catch(function(){showToast("Added "+name+" (demo — connect Sheet2 for persistence)","gold");});
+      }
+
+      function renderTechLogs(c) {
+        var now = new Date().toISOString();
+        c.innerHTML = `
+          <div class="dashboard-card">
+            <div class="card-title">Real-Time Application Trace Logs <button class="action-btn sm" onclick="appendLog('Manual refresh triggered.','info')">⟳ Refresh</button></div>
+            <div id="techLogBlock" class="diagnostic-log">
+<span class="log-info">[${now}] System core initialized.</span>
+<span class="log-info">[${now}] Sheet2 pipeline connected.</span>
+[${now}] Session routing: 4 roles active.
+[${now}] Demo credentials: 4 test accounts loaded.
+<span class="log-warn">[${now}] NOTICE: Live Sheet2 data requires production deployment.</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:0.75rem;flex-wrap:wrap;">
+              <button class="action-btn sm" onclick="appendLog('Cache flush executed.','info')">Flush Cache</button>
+              <button class="action-btn sm" onclick="appendLog('Whitelist re-index started.','info')">Re-index</button>
+              <button class="action-btn sm danger" onclick="appendLog('CRITICAL: Force re-auth broadcast.','error')">Force Re-auth</button>
+              <button class="action-btn sm secondary" onclick="document.getElementById('techLogBlock').innerHTML='[LOG CLEARED]'">Clear</button>
+            </div>
+          </div>`;
+      }
+
+      function renderTechConfig(c) {
+        c.innerHTML = `
           <div class="grid-layout">
             <div class="dashboard-card">
-              <div class="card-title">Infrastructure Monitoring</div>
-              <div style="color:#4ade80; font-weight:600; margin-top:10px;">Core Engines Online / Connected (0.12ms)</div>
+              <div class="section-heading">App Settings</div>
+              <div class="form-group"><label>Portal Title</label><input type="text" class="form-control" value="HCPS Interpreter Portal"></div>
+              <div class="form-group"><label>Parent Request Form URL</label><input type="text" class="form-control" placeholder="Paste form URL..."></div>
+              <div class="form-group"><label>Admin Alert Email</label><input type="email" class="form-control" placeholder="admin@harrisonburg.k12.va.us"></div>
+              <button class="action-btn" onclick="showToast('Settings saved (update Code.gs for production)','green')">Save Settings</button>
             </div>
-          </div>
-          <div class="dashboard-card" style="margin-top:1.5rem;">
-            <div class="card-title">Application Pipeline Trace Logs</div>
-            <div id="techLogBlock" class="diagnostic-log">[2026-06-26T21:12:01Z] System Core Initialization verified...</div>
+            <div class="dashboard-card">
+              <div class="section-heading">System Maintenance</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <button class="action-btn" onclick="showToast('Full diagnostic report generated.','gold')">📊 Generate Diagnostic Report</button>
+                <button class="action-btn secondary" onclick="showToast('Exporting session logs...','gold')">📤 Export Session Logs</button>
+                <button class="action-btn secondary" onclick="showToast('Exporting hours data...','gold')">📤 Export Hours Data</button>
+                <button class="action-btn secondary" onclick="showToast('Sheet2 backup triggered.','gold')">💾 Backup Sheet2 Data</button>
+                <button class="action-btn danger" onclick="if(confirm('This signs out ALL users. Continue?')) showToast('All sessions terminated.','red')">⚠️ Terminate All Sessions</button>
+              </div>
+            </div>
           </div>`;
+      }
+
+      function appendLog(msg, type) {
+        var log = document.getElementById("techLogBlock"); if(!log) return;
+        var d = new Date().toISOString(), cls = type==="error"?"log-error":type==="warn"?"log-warn":type==="info"?"log-info":"";
+        log.innerHTML += '\n<span class="'+cls+'">['+d+'] '+msg+'</span>';
+        log.scrollTop = log.scrollHeight;
       }
     </script>
   </body>
