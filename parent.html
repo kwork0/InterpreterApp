@@ -3,79 +3,91 @@
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>HCPS Interpreter Request Form</title> 
+    <title>HCPS Interpreter Portal - Login</title> 
     <style> 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 15px; background: #f1f5f9; margin: 0; } 
-        .container { max-width: 450px; margin: auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-top: 20px; } 
-        .logo-area { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; } 
-        .logo-area h1 { font-size: 1.3rem; margin: 0; color: #1e293b; } 
-        .logo-area p { margin: 5px 0 0 0; font-size: 0.85rem; color: #64748b; } 
-        label { display: block; font-weight: 500; font-size: 0.9rem; margin-top: 15px; color: #334155; } 
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; background-color: #f8fafc; } 
-        input:focus, select:focus { outline: none; border-color: #3b82f6; background-color: #fff; } 
-        button { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; margin-top: 24px; cursor: pointer; transition: background 0.2s; } 
-        button:hover { background: #1d4ed8; } 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 15px; background: #102542; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; } 
+        .container { max-width: 420px; width: 100%; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); text-align: center; } 
+        .logo-area { text-align: center; margin-bottom: 20px; } 
+        .district-logo { max-width: 140px; height: auto; margin-bottom: 12px; }
+        .logo-area h1 { font-size: 1.3rem; margin: 0 0 5px 0; color: #102542; } 
+        .logo-area p { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; } 
+        .prompt-msg { font-size: 1.05rem; font-weight: 500; color: #1e293b; margin: 20px 0; }
+        .input-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; color: #475569; margin-bottom: 6px; } 
+        input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; background-color: #f8fafc; transition: all 0.2s; } 
+        input:focus { outline: none; border-color: #f39200; background-color: #fff; } 
+        button { width: 100%; padding: 14px; background: #f39200; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; text-transform: uppercase; } 
+        button:hover { background: #d98200; } 
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .error-lbl { color: #dc2626; font-size: 0.85rem; margin-top: 12px; font-weight: 500; display: none; }
+        .hint-text { font-size: 0.75rem; color: #94a3b8; margin-top: 24px; line-height: 1.4; }
     </style> 
 </head> 
 <body> 
     <div class="container"> 
         <div class="logo-area"> 
+            <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" alt="HCPS District Logo" class="district-logo">
             <h1>Harrisonburg City Public Schools</h1> 
             <p>Student Language Interpreter Program</p> 
         </div> 
-        <h2 style="font-size: 1.15rem; margin: 0; text-align: center; color: #1e293b;">Request an Interpreter Form</h2> 
-        <form id="mobileRequestForm"> 
-            <label for="parentName">Your Full Name (Nombre Completo):</label> 
-            <input type="text" id="parentName" placeholder="e.g., Maria Ramirez" required> 
+        
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0;">
+        
+        <!-- Document requirement string placed on the middle top area -->
+        <div class="prompt-msg">Welcome, please login to continue:</div> 
+        
+        <form id="authLoginForm"> 
+            <div class="input-group">
+                <label for="userEmail">District Email Address</label> 
+                <input type="email" id="userEmail" placeholder="username@harrisonburg.k12.va.us" required> 
+            </div>
             
-            <label for="language">Language Required (Idioma):</label> 
-            <select id="language" required> 
-                <option value="Spanish">Spanish (Español)</option> 
-                <option value="Somali">Somali (Soomaali)</option> 
-                <option value="Arabic">Arabic (العربية)</option> 
-                <option value="Haitian Creole">Haitian Creole (Kreyòl Ayisyen)</option> 
-                <option value="Amharic">Amharic (አማርኛ)</option> 
-            </select> 
-            
-            <label for="date">Meeting Date (Fecha de Reunión):</label> 
-            <input type="date" id="date" required> 
-            
-            <label for="notes">Additional Information / Teacher Name:</label> 
-            <textarea id="notes" rows="3" placeholder="Any optional details..."></textarea> 
-            
-            <button type="submit">Submit Request</button> 
+            <button type="submit" id="submitBtn">Sign In</button> 
+            <div class="error-lbl" id="errorMsg">Access Denied. Email address was not recognized in our database.</div>
         </form> 
+
+        <div class="hint-text">
+            Testing Mode: Please verify that your credentials exist on the roster spreadsheet to proceed to the main interpreter assignment schedule dashboard.
+        </div>
     </div> 
     
     <script> 
         const API_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkl4i-Ys0izkWsWeZKGZOBWcRVBX/exec"; 
         
-        document.getElementById('mobileRequestForm').addEventListener('submit', async (e) => { 
+        document.getElementById('authLoginForm').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             
-            const payload = { 
-                parentName: document.getElementById('parentName').value, 
-                language: document.getElementById('language').value, 
-                date: document.getElementById('date').value, 
-                notes: document.getElementById('notes').value, 
-                status: "Pending" 
-            }; 
+            const emailInput = document.getElementById('userEmail').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const errorLbl = document.getElementById('errorMsg');
+            
+            errorLbl.style.display = "none";
+            submitBtn.innerText = "Verifying Credentials...";
+            submitBtn.disabled = true;
             
             try { 
-                // Sends data smoothly without triggering Google's security blocks 
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify(payload) 
-                }); 
+                // Requests login lookup action framework from the spreadsheet macro deployment
+                const response = await fetch(`${API_URL}?action=loginCheck&email=${encodeURIComponent(emailInput)}`);
+                const data = await response.json();
                 
-                // Since 'no-cors' mode hides the response status, we show success here 
-                alert("Your interpreter request has been sent to HCPS. Thank you!"); 
-                document.getElementById('mobileRequestForm').reset(); 
+                if (data && data.authorized === true) {
+                    // Cache the verified user object payload into the session browser data frame
+                    sessionStorage.setItem("hcps_user", JSON.stringify({
+                        email: emailInput,
+                        name: data.userName || "District Interpreter"
+                    }));
+                    
+                    // Proceed straight into dashboard view environment 
+                    window.location.href = "index.html";
+                } else {
+                    throw new Error("Unauthorized");
+                }
                 
             } catch (err) { 
                 console.error(err); 
-                alert("Connection error. Please try again."); 
+                errorLbl.style.display = "block";
+                submitBtn.innerText = "Sign In";
+                submitBtn.disabled = false;
             } 
         }); 
     </script> 
