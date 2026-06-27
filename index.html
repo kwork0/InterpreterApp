@@ -85,7 +85,6 @@
       <div class="login-box">
         <input type="email" id="userEmail" class="input-field" placeholder="Enter school email or use credentials..." required>
         <button type="button" class="google-btn" onclick="handleAuthSubmit()">
-          <!-- Embedded SVG Google Icon for Interactivity State -->
           <svg class="google-icon" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -139,7 +138,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><td>Ms. Davis [Teacher]</td></td>
+                  <td>Ms. Davis [Teacher]</td>
                   <td>Period 2 - 3</td>
                   <td>09:15 AM - 11:30 AM</td>
                   <td>Room 204</td>
@@ -153,7 +152,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td><td>Mr. Albright [Teacher]</td></td>
+                  <td>Mr. Albright [Teacher]</td>
                   <td>Period 5</td>
                   <td>01:00 PM - 02:15 PM</td>
                   <td>Auditorium B</td>
@@ -179,7 +178,6 @@
     <script>
       var sessionUserData = null;
 
-      // Automated session verification on startup
       window.onload = function() {
         var cached = sessionStorage.getItem("hcps_secure_session");
         if (cached) {
@@ -195,7 +193,6 @@
           return;
         }
 
-        // Domain restriction verification before calling backend
         if(!emailInput.toLowerCase().endsWith("@harrisonburg.k12.va.us")) {
           alert("Error: Verification rejected. A valid @harrisonburg.k12.va.us account profile context is required.");
           return;
@@ -232,24 +229,24 @@
         if(!val) return;
         google.script.run
           .withSuccessHandler(function(res) {
-             alert("Status Variable synchronised via live Sheet pipeline: " + val);
+             if(res.success) {
+               alert("Status variable updated successfully inside Sheet2 (Column J): " + val);
+             } else {
+               alert("Status sync message: " + res.error);
+             }
           })
           .updateAssignmentStatus(sessionUserData.email, val);
       }
 
       function initializeRoleWorkspace() {
-        // Clear login frame view UI
         document.getElementById("loginSection").style.display = "none";
         
-        // Show application framework
         var appWorkspace = document.getElementById("appWorkspace");
         appWorkspace.style.display = "flex";
         
-        // Configure standard context identifiers
         document.getElementById("roleLabel").innerText = sessionUserData.role + " Profile";
         document.getElementById("userNameText").innerText = sessionUserData.name + " (" + sessionUserData.email + ") ";
 
-        // Execute routing depending on verified systemic access tier flags
         var viewContainer = document.getElementById("viewContainer");
         
         if (sessionUserData.role === "Interpreter") {
@@ -327,7 +324,7 @@
       }
 
       // =========================================================================
-      // TEACHER / CLUB MANAGER ADMINISTRATIVE WORKSPACE
+      // TEACHER / CLUB MANAGER ADMINISTRATIVE WORKSPACE (ALIGNED FOR SHEET2)
       // =========================================================================
       function renderAdminDashboard(container) {
         container.innerHTML = `
@@ -372,21 +369,21 @@
               </form>
             </div>
             <div class="dashboard-card">
-              <div class="card-title">Live Operational Tracking Feed & Pipeline Logs</div>
+              <div class="card-title">Live Operational Tracking Feed (Sheet2 Live)</div>
               <div class="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Location</th>
-                      <th>Staff Account Target</th>
-                      <th>Teacher Box</th>
-                      <th>Calculated Window Allocation</th>
-                      <th>Live Feed State</th>
+                      <th>Teacher/Ref</th>
+                      <th>Interpreter Email</th>
+                      <th>School Location</th>
+                      <th>Time Frame</th>
+                      <th>Live Status</th>
                     </tr>
                   </thead>
                   <tbody id="adminLiveTrackingRows">
                     <tr>
-                      <td colspan="5" style="text-align:center; color:var(--text-muted);">Awaiting sync event parameters from linked active spreadsheets...</td>
+                      <td colspan="5" style="text-align:center; color:var(--text-muted);">Awaiting active sync parameters from Sheet2...</td>
                     </tr>
                   </tbody>
                 </table>
@@ -409,7 +406,7 @@
         google.script.run
           .withSuccessHandler(function(res) {
             if(res.success) {
-              alert("Assignment verified and structural metrics locked down. Auto Calculated Duration: " + res.computedHours + " hours.");
+              alert("Assignment verified and structural metrics locked down inside Sheet2. Auto Calculated Duration: " + res.computedHours + " hours.");
               document.getElementById("assignmentForm").reset();
             } else {
               alert("System pipeline logic fault: " + res.error);
