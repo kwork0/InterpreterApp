@@ -136,12 +136,30 @@
             </div>
         </div>
 
-        <!-- OTHER SECTIONS RETAINED FOR CORE UI WORKFLOW -->
         <div id="conference-sec" class="app-section">
             <div class="section-title">Upcoming Parent-Teacher Conference Days</div>
             <div class="card">
                 <h3>Fall Term Conferences</h3>
                 <p><b>Date:</b> October 22, 2026 · <b>Time:</b> 4:00 PM - 7:00 PM</p>
+            </div>
+        </div>
+
+        <!-- ADDED MISSING SECTION CONTAINER ASSETS -->
+        <div id="task-sec" class="app-section">
+            <div class="section-title">Interpreter Task Board</div>
+            <div class="card">
+                <div class="task-item">
+                    <span class="task-tag">High Priority</span>
+                    <p style="margin: 5px 0 0 0;">Review standard vocabulary terms for specialized ENL Math exams.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="directory-sec" class="app-section">
+            <div class="section-title">Program Directory</div>
+            <div class="card">
+                <p><b>HCPS Language Services Office:</b> Office 102-B</p>
+                <p><b>Support Contact Helpline:</b> services-support@harrisonburg.k12.va.us</p>
             </div>
         </div>
     </main>
@@ -164,6 +182,16 @@
             document.querySelectorAll('sidebar nav a').forEach(link => link.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
             element.classList.add('active');
+        }
+
+        // ADDED MISSING SEARCH FILTER LOGIC
+        function filterParentTable() {
+            const input = document.getElementById("parentSearch").value.toUpperCase();
+            const rows = document.getElementById("parentRequestsBody").getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                let text = rows[i].textContent || rows[i].innerText;
+                rows[i].style.display = text.toUpperCase().indexOf(input) > -1 ? "" : "none";
+            }
         }
     </script>
 </body>
