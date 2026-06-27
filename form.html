@@ -1,0 +1,88 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>HCPS Interpreter Portal - Login</title> 
+    <style> 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 15px; background: #102542; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; } 
+        .container { max-width: 420px; width: 100%; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); text-align: center; } 
+        .logo-area { text-align: center; margin-bottom: 20px; } 
+        .district-logo { max-width: 140px; height: auto; margin-bottom: 12px; }
+        .logo-area h1 { font-size: 1.3rem; margin: 0 0 5px 0; color: #102542; } 
+        .logo-area p { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; } 
+        .prompt-msg { font-size: 1.05rem; font-weight: 500; color: #1e293b; margin: 20px 0; }
+        .input-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; color: #475569; margin-bottom: 6px; } 
+        input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; background-color: #f8fafc; transition: all 0.2s; } 
+        input:focus { outline: none; border-color: #f39200; background-color: #fff; } 
+        button { width: 100%; padding: 14px; background: #f39200; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; text-transform: uppercase; } 
+        button:hover { background: #d98200; } 
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .error-lbl { color: #dc2626; font-size: 0.85rem; margin-top: 12px; font-weight: 500; display: none; }
+        .hint-text { font-size: 0.75rem; color: #94a3b8; margin-top: 24px; line-height: 1.4; }
+    </style> 
+</head> 
+<body> 
+    <div class="container"> 
+        <div class="logo-area"> 
+            <img src="https://www.harrisonburg.k12.va.us/images/getSchoolPicture.cfm?id=20" alt="HCPS District Logo" class="district-logo">
+            <h1>Harrisonburg City Public Schools</h1> 
+            <p>Student Language Interpreter Program</p> 
+        </div> 
+        
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0;">
+        
+        <div class="prompt-msg">Welcome, please login to continue:</div> 
+        
+        <form id="authLoginForm"> 
+            <div class="input-group">
+                <label for="userEmail">District Email Address</label> 
+                <input type="email" id="userEmail" placeholder="username@harrisonburg.k12.va.us" required> 
+            </div>
+            
+            <button type="submit" id="submitBtn">Sign In</button> 
+            <div class="error-lbl" id="errorMsg">Access Denied. Email address was not recognized in our database.</div>
+        </form> 
+
+        <div class="hint-text">
+            Testing Mode: Please verify that your credentials exist on the roster spreadsheet to proceed.
+        </div>
+    </div> 
+    
+    <script> 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkl4i-Ys0izkWsWeZKGZOBWcRVBX/exec"; 
+        
+        document.getElementById('authLoginForm').addEventListener('submit', async (e) => { 
+            e.preventDefault(); 
+            const emailInput = document.getElementById('userEmail').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const errorLbl = document.getElementById('errorMsg');
+            
+            errorLbl.style.display = "none";
+            submitBtn.innerText = "Verifying Credentials...";
+            submitBtn.disabled = true;
+            
+            try { 
+                const response = await fetch(`${API_URL}?action=loginCheck&email=${encodeURIComponent(emailInput)}`);
+                const data = await response.json();
+                
+                if (data && data.authorized === true) {
+                    sessionStorage.setItem("hcps_user", JSON.stringify({
+                        email: emailInput,
+                        name: data.userName || "District Interpreter"
+                    }));
+                    window.location.href = "index.html";
+                } else {
+                    throw new Error("Unauthorized");
+                }
+            } catch (err) { 
+                console.error(err); 
+                errorLbl.style.display = "block";
+                submitBtn.innerText = "Sign In";
+                submitBtn.disabled = false;
+            } 
+        }); 
+    </script> 
+</body> 
+</html>
