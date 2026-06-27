@@ -11,7 +11,21 @@
         sidebar nav a { display: block; color: #cbd5e1; padding: 12px 10px; text-decoration: none; font-size: 0.95rem; border-radius: 6px; margin-bottom: 5px; cursor: pointer; }
         sidebar nav a:hover, sidebar nav a.active { color: white; background: #f39200; }
         main { flex: 1; padding: 30px; box-sizing: border-box; max-width: 1200px; margin-left: 260px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Updated Header Container with Dropdown Element Alignment */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; position: relative; }
+        
+        /* Profile Dropdown Architecture */
+        .profile-container { position: relative; display: flex; align-items: center; cursor: pointer; }
+        .avatar-circle { width: 42px; height: 42px; background: #f39200; color: white; font-weight: bold; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid white; transition: transform 0.2s; }
+        .avatar-circle:hover { transform: scale(1.05); }
+        .dropdown-menu { position: absolute; top: 50px; right: 0; background: white; min-width: 200px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: none; z-index: 100; padding: 6px 0; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-user-details { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #334155; }
+        .dropdown-user-details strong { display: block; color: #102542; font-size: 0.95rem; margin-bottom: 2px; }
+        .dropdown-item { display: block; width: 100%; padding: 10px 16px; text-align: left; background: none; border: none; font-size: 0.9rem; color: #dc2626; font-weight: 600; cursor: pointer; }
+        .dropdown-item:hover { background: #fef2f2; }
+
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .stats-grid .stat-card:nth-child(1) { border-left: 4px solid #102542; }
@@ -37,8 +51,6 @@
         .search-box { width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; box-sizing: border-box; }
         .app-section { display: none; }
         .app-section.active { display: block; }
-        .logout-btn { background: #dc2626; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin-top: 15px; width: 100%; }
-        .logout-btn:hover { background: #b91c1c; }
     </style>
     <script>
         // STRICT SECURITY GUARDRAIL: Check authentication before loading body
@@ -60,7 +72,6 @@
             <a onclick="switchSection('conference-sec', this)">Conference Days</a>
             <a onclick="switchSection('task-sec', this)">Task Board</a>
             <a onclick="switchSection('directory-sec', this)">Program Directory</a>
-            <button class="logout-btn" onclick="logout()">Log Out</button>
         </nav>
     </sidebar>
 
@@ -69,6 +80,18 @@
             <div>
                 <h1 style="margin: 0; font-size: 1.75rem;">Welcome, <span id="dashDynamicName">Interpreter</span>!</h1>
                 <p style="margin: 5px 0 0 0; color: #64748b;">Interpreter Dashboard · Harrisonburg High School</p>
+            </div>
+            
+            <!-- Interactive Top-Right Avatar Dropdown Asset -->
+            <div class="profile-container" onclick="toggleDropdown(event)">
+                <div class="avatar-circle" id="userAvatarBtn">I</div>
+                <div class="dropdown-menu" id="profileDropdown">
+                    <div class="dropdown-user-details">
+                        <strong id="dropMenuName">Loading Name...</strong>
+                        <span id="dropMenuEmail">loading...</span>
+                    </div>
+                    <button class="dropdown-item" onclick="logout()">Log Out</button>
+                </div>
             </div>
         </div>
 
@@ -130,7 +153,7 @@
                     <div class="card" style="font-size: 0.85rem; line-height: 1.5;">
                         <strong id="sessionProfileName">Loading User...</strong><br>
                         <span style="color: #64748b;" id="sessionProfileEmail">loading...</span><br><br>
-                        <strong>System Role:</strong> Authorized District Interpreter Form Account
+                        <strong>System Role:</strong> Authorized District Interpreter Account
                     </div>
                 </div>
             </div>
@@ -144,7 +167,6 @@
             </div>
         </div>
 
-        <!-- ADDED MISSING SECTION CONTAINER ASSETS -->
         <div id="task-sec" class="app-section">
             <div class="section-title">Interpreter Task Board</div>
             <div class="card">
@@ -165,12 +187,26 @@
     </main>
 
     <script>
-        // Apply session data dynamically to elements
         if (activeUser) {
             document.getElementById('dashDynamicName').innerText = activeUser.name;
             document.getElementById('sessionProfileName').innerText = activeUser.name;
             document.getElementById('sessionProfileEmail').innerText = activeUser.email;
+            
+            // Populating Dropdown content and Avatar Initial
+            document.getElementById('dropMenuName').innerText = activeUser.name;
+            document.getElementById('dropMenuEmail').innerText = activeUser.email;
+            document.getElementById('userAvatarBtn').innerText = activeUser.name.charAt(0).toUpperCase();
         }
+
+        function toggleDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown if clicking outside of it
+        window.addEventListener('click', () => {
+            document.getElementById('profileDropdown').classList.remove('show');
+        });
 
         function logout() {
             sessionStorage.clear();
@@ -184,7 +220,6 @@
             element.classList.add('active');
         }
 
-        // ADDED MISSING SEARCH FILTER LOGIC
         function filterParentTable() {
             const input = document.getElementById("parentSearch").value.toUpperCase();
             const rows = document.getElementById("parentRequestsBody").getElementsByTagName("tr");
