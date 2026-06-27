@@ -12,10 +12,8 @@
         sidebar nav a:hover, sidebar nav a.active { color: white; background: #f39200; }
         main { flex: 1; padding: 30px; box-sizing: border-box; max-width: 1200px; margin-left: 260px; }
         
-        /* Updated Header Container with Dropdown Element Alignment */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; position: relative; }
         
-        /* Profile Dropdown Architecture */
         .profile-container { position: relative; display: flex; align-items: center; cursor: pointer; }
         .avatar-circle { width: 42px; height: 42px; background: #f39200; color: white; font-weight: bold; font-size: 1.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid white; transition: transform 0.2s; }
         .avatar-circle:hover { transform: scale(1.05); }
@@ -53,7 +51,6 @@
         .app-section.active { display: block; }
     </style>
     <script>
-        // STRICT SECURITY GUARDRAIL: Check authentication before loading body
         const activeUser = JSON.parse(sessionStorage.getItem("hcps_user"));
         if (!activeUser) {
             window.location.href = "parent.html"; 
@@ -82,7 +79,6 @@
                 <p style="margin: 5px 0 0 0; color: #64748b;">Interpreter Dashboard · Harrisonburg High School</p>
             </div>
             
-            <!-- Interactive Top-Right Avatar Dropdown Asset -->
             <div class="profile-container" onclick="toggleDropdown(event)">
                 <div class="avatar-circle" id="userAvatarBtn">I</div>
                 <div class="dropdown-menu" id="profileDropdown">
@@ -134,26 +130,27 @@
                         </tbody>
                     </table>
 
-                    <div class="section-title" style="color: #dc2626; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="section-title" style="color: #102542; display: flex; justify-content: space-between; align-items: center;">
                         <span>Incoming Parent Mobile Requests</span>
-                        <input type="text" id="parentSearch" class="search-box" style="margin: 0;" placeholder="🔍 Search..." onkeyup="filterParentTable()">
+                        <input type="text" id="parentSearch" class="search-box" style="margin: 0;" placeholder="🔍 Search parent name..." onkeyup="filterParentTable()">
                     </div>
                     <table>
                         <thead>
-                            <tr><th>Parent Name</th><th>Language</th><th>Target Date</th><th>Action</th></tr>
+                            <tr><th>Parent Name</th><th>Language</th><th>Target Date</th><th>Notes</th><th>Status</th></tr>
                         </thead>
                         <tbody id="parentRequestsBody">
-                            <tr><td colspan="4" style="text-align: center; color: #64748b; font-style: italic;">Awaiting database synchronization...</td></tr>
+                            <tr><td colspan="5" style="text-align: center; color: #64748b; font-style: italic;">Loading live request feed...</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div>
-                    <div class="section-title">Current Profile session</div>
+                    <div class="section-title">Current Profile Session</div>
                     <div class="card" style="font-size: 0.85rem; line-height: 1.5;">
-                        <strong id="sessionProfileName">Loading User...</strong><br>
+                        <strong id="sessionProfileName">Loading User...</strong>
+                        <div id="sessionProfileRole" style="color: #f39200; font-weight: bold; margin-bottom: 5px;">Role: ...</div>
                         <span style="color: #64748b;" id="sessionProfileEmail">loading...</span><br><br>
-                        <strong>System Role:</strong> Authorized District Interpreter Account
+                        <strong>System Role:</strong> Authorized District Account Profile
                     </div>
                 </div>
             </div>
@@ -187,31 +184,54 @@
     </main>
 
     <script>
-        if (activeUser) {
-    document.getElementById('dashDynamicName').innerText = activeUser.name;
-    document.getElementById('sessionProfileName').innerText = activeUser.name;
-    document.getElementById('sessionProfileEmail').innerText = activeUser.email;
-    
-    // Display the dynamic role underneath their profile card
-    document.getElementById('sessionProfileName').insertAdjacentHTML('afterend', `<br><span style="color: #f39200; font-weight: bold;">Role: ${activeUser.role}</span>`);
-    
-    document.getElementById('dropMenuName').innerText = activeUser.name;
-    document.getElementById('dropMenuEmail').innerText = activeUser.email;
-    document.getElementById('userAvatarBtn').innerText = activeUser.name.charAt(0).toUpperCase();
+        const API_URL = "https://script.google.com/macros/s/AKfycbwjccnPNoStbtifYzzD6Egb3yPgiqd8zotDH5TAqkl4i-Ys0izkWsWeZKGZOBWcRVBX/exec"; 
 
-    // Custom Role Guardrails: Hide elements from non-admins if desired
-    if (activeUser.role !== "Admin" && activeUser.role !== "Coordinator") {
-        // Example: Hide administrative controls or change styling for regular interpreters
-        console.log("Standard Interpreter View Loaded.");
-    }
-}
+        if (activeUser) {
+            document.getElementById('dashDynamicName').innerText = activeUser.name;
+            document.getElementById('sessionProfileName').innerText = activeUser.name;
+            document.getElementById('sessionProfileEmail').innerText = activeUser.email;
+            document.getElementById('sessionProfileRole').innerText = "Role: " + (activeUser.role || "Interpreter");
+            
+            document.getElementById('dropMenuName').innerText = activeUser.name;
+            document.getElementById('dropMenuEmail').innerText = activeUser.email;
+            document.getElementById('userAvatarBtn').innerText = activeUser.name.charAt(0).toUpperCase();
+        }
+
+        // FETCH LIVE DATA FROM GOOGLE SPREADSHEET 
+        async function loadLiveParentRequests() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const tbody = document.getElementById("parentRequestsBody");
+                
+                if(!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b;">No parent form requests found.</td></tr>`;
+                    return;
+                }
+                
+                tbody.innerHTML = ""; // Clear loader
+                data.forEach(item => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td><b>${item.parentName}</b></td>
+                        <td>${item.language}</td>
+                        <td>${item.date}</td>
+                        <td style="color: #64748b; font-size: 0.85rem;">${item.notes || '-'}</td>
+                        <td><span class="status upcoming">${item.status || 'Pending'}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById("parentRequestsBody").innerHTML = `<tr><td colspan="5" style="text-align: center; color: #dc2626;">Error syncing live rows from spreadsheet database.</td></tr>`;
+            }
+        }
 
         function toggleDropdown(e) {
             e.stopPropagation();
             document.getElementById('profileDropdown').classList.toggle('show');
         }
 
-        // Close dropdown if clicking outside of it
         window.addEventListener('click', () => {
             document.getElementById('profileDropdown').classList.remove('show');
         });
@@ -236,6 +256,9 @@
                 rows[i].style.display = text.toUpperCase().indexOf(input) > -1 ? "" : "none";
             }
         }
+
+        // Initialize table payload trigger on load
+        window.addEventListener("DOMContentLoaded", loadLiveParentRequests);
     </script>
 </body>
 </html>
